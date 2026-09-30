@@ -8,34 +8,48 @@ interface ApiErrorInit {
   status: number;
   code: string;
   message: string;
+  timestamp: string;
   details?: unknown;
   requestId?: string;
+  method?: string;
+  path?: string;
 }
 
 export class ApiError extends Error {
   status: number;
   code: string;
+  timestamp: string;
   details?: unknown;
   requestId?: string;
+  method?: string;
+  path?: string;
 
   constructor(init: ApiErrorInit) {
     super(init.message);
     this.name = 'ApiError';
     this.status = init.status;
     this.code = init.code;
+    this.timestamp = init.timestamp;
     this.details = init.details;
     this.requestId = init.requestId;
+    this.method = init.method;
+    this.path = init.path;
   }
 }
 
 function toApiError(error: AxiosError<ApiErrorBody>): ApiError {
   const response = error.response;
+  const method = error.config?.method?.toUpperCase();
+  const requestPath = error.config?.url;
 
   if (!response) {
     return new ApiError({
       status: 0,
       code: error.code === 'ECONNABORTED' ? 'TIMEOUT' : 'NETWORK_ERROR',
       message: 'No fue posible comunicarse con el servidor',
+      timestamp: new Date().toISOString(),
+      method,
+      path: requestPath,
     });
   }
 
@@ -46,8 +60,11 @@ function toApiError(error: AxiosError<ApiErrorBody>): ApiError {
     status: response.status,
     code: body?.error?.code ?? 'UNKNOWN_ERROR',
     message: body?.error?.message ?? 'Ocurrió un error inesperado',
+    timestamp: body?.timestamp ?? new Date().toISOString(),
     details: body?.error?.details,
     requestId: body?.requestId ?? (typeof headerRequestId === 'string' ? headerRequestId : undefined),
+    method,
+    path: body?.path ?? requestPath,
   });
 }
 
@@ -68,7 +85,12 @@ export function refreshAccessToken(): Promise<string> {
 
   if (!current) {
     return Promise.reject(
-      new ApiError({ status: 401, code: 'NO_REFRESH_TOKEN', message: 'No hay una sesión para renovar' })
+      new ApiError({
+        status: 401,
+        code: 'NO_REFRESH_TOKEN',
+        message: 'No hay una sesión para renovar',
+        timestamp: new Date().toISOString(),
+      })
     );
   }
 
@@ -80,7 +102,7 @@ export function refreshAccessToken(): Promise<string> {
       return tokens.accessToken;
     })
     .catch((error: AxiosError<ApiErrorBody>) => {
-      useAuthStore.getState().clearSession();
+      useAuthStore.getState().clearSession('expired');
       throw toApiError(error);
     })
     .finally(() => {
