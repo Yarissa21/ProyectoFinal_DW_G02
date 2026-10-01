@@ -12,6 +12,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/inicio', label: 'Inicio', allowedRoles: ['EMPLOYEE'] },
+  { path: '/empleados', label: 'Empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
 ];
 
 function AppLayout() {
