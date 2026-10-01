@@ -19,7 +19,7 @@ const MESSAGE_BY_STATUS: Record<number, string> = {
   503: 'El servicio no está disponible temporalmente. Inténtalo de nuevo en unos momentos.',
 };
 
-const FIXED_MESSAGE_STATUSES = new Set([0, 401, 403, 429, 500, 503]);
+const FIXED_MESSAGE_STATUSES = new Set([0, 401, 403, 404, 429, 500, 503]);
 const RETRYABLE_STATUSES = new Set([0, 500, 503]);
 
 export interface ErrorDescription {
