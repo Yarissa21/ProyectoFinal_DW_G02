@@ -4,6 +4,7 @@ import type { ErrorDescription } from '../services/errorMessages';
 interface ErrorAlertProps {
   error: ErrorDescription;
   onRetry?: () => void;
+  compact?: boolean;
 }
 
 function buildReport(error: ErrorDescription): string {
@@ -22,7 +23,7 @@ function formatTime(iso: string): string {
   return Number.isNaN(date.getTime()) ? iso : date.toLocaleString('es-GT');
 }
 
-function ErrorAlert({ error, onRetry }: ErrorAlertProps) {
+function ErrorAlert({ error, onRetry, compact = false }: ErrorAlertProps) {
   const [copied, setCopied] = useState(false);
 
   const copyReport = async () => {
@@ -39,50 +40,73 @@ function ErrorAlert({ error, onRetry }: ErrorAlertProps) {
 
   return (
     <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900">
-      <p className="font-semibold">Error: {error.message}</p>
+      <p className="font-semibold">{error.message}</p>
 
-      <dl className="mt-2 space-y-0.5 text-xs">
-        {error.code && (
-          <div className="flex gap-1">
-            <dt className="font-medium">Código:</dt>
-            <dd>{error.code}</dd>
-          </div>
-        )}
-        {error.requestId && (
-          <div className="flex gap-1">
-            <dt className="font-medium">Identificador de solicitud:</dt>
-            <dd className="break-all">{error.requestId}</dd>
-          </div>
-        )}
-        {error.method && error.path && (
-          <div className="flex gap-1">
-            <dt className="font-medium">Solicitud:</dt>
-            <dd className="break-all">
-              {error.method} {error.path}
-            </dd>
-          </div>
-        )}
-        {error.timestamp && (
-          <div className="flex gap-1">
-            <dt className="font-medium">Hora:</dt>
-            <dd>{formatTime(error.timestamp)}</dd>
-          </div>
-        )}
-      </dl>
+      {!compact && (error.code || error.requestId) && (
+        <p className="mt-1 text-xs">
+          {error.code && <>Código: {error.code}</>}
+          {error.code && error.requestId && ' · '}
+          {error.requestId && (
+            <>
+              ID: <span className="break-all">{error.requestId}</span>
+            </>
+          )}
+        </p>
+      )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {onRetry && error.retryable && (
-          <button type="button" onClick={onRetry} className={buttonClass}>
-            Reintentar
-          </button>
-        )}
-        <button type="button" onClick={copyReport} className={buttonClass}>
-          Copiar datos para reporte
+      {onRetry && error.retryable && (
+        <button type="button" onClick={onRetry} className={`${buttonClass} mt-3`}>
+          Reintentar
         </button>
-        <span aria-live="polite" className="text-xs">
-          {copied ? 'Datos copiados' : ''}
-        </span>
-      </div>
+      )}
+
+      <details className="mt-3 text-xs">
+        <summary className="cursor-pointer font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-800">
+          Detalles técnicos
+        </summary>
+
+        <dl className="mt-2 space-y-0.5">
+          {error.status !== undefined && (
+            <div className="flex gap-1">
+              <dt className="font-medium">Estado HTTP:</dt>
+              <dd>{error.status === 0 ? 'Sin respuesta' : error.status}</dd>
+            </div>
+          )}
+          {error.code && (
+            <div className="flex gap-1">
+              <dt className="font-medium">Código:</dt>
+              <dd>{error.code}</dd>
+            </div>
+          )}
+          {error.requestId && (
+            <div className="flex gap-1">
+              <dt className="font-medium">ID de solicitud:</dt>
+              <dd className="break-all">{error.requestId}</dd>
+            </div>
+          )}
+          {error.method && error.path && (
+            <div className="flex gap-1">
+              <dt className="font-medium">Solicitud:</dt>
+              <dd className="break-all">
+                {error.method} {error.path}
+              </dd>
+            </div>
+          )}
+          {error.timestamp && (
+            <div className="flex gap-1">
+              <dt className="font-medium">Hora:</dt>
+              <dd>{formatTime(error.timestamp)}</dd>
+            </div>
+          )}
+        </dl>
+
+        <div className="mt-2 flex items-center gap-2">
+          <button type="button" onClick={copyReport} className={buttonClass}>
+            Copiar datos para reporte
+          </button>
+          <span aria-live="polite">{copied ? 'Datos copiados' : ''}</span>
+        </div>
+      </details>
     </div>
   );
 }

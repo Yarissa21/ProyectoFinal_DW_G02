@@ -103,7 +103,7 @@ function LoginPage() {
           </div>
 
           {serverError && (
-            <ErrorAlert error={serverError} onRetry={() => void handleSubmit(onSubmit)()} />
+            <ErrorAlert compact error={serverError} onRetry={() => void handleSubmit(onSubmit)()} />
           )}
 
           <button
