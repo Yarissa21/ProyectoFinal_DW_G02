@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Modal from '../Modal';
 import FormField from '../employees/FormField';
 import ServerIssueAlert from '../employees/ServerIssueAlert';
 import { useCreateAcademicRecord, useUpdateAcademicRecord } from '../../hooks/useAcademicRecords';
-import { ACADEMIC_FORM_FIELDS, academicSchema, type AcademicFormValues } from '../../schemas/academicSchema';
+import {
+  ACADEMIC_FORM_FIELDS,
+  buildAcademicSchema,
+  localToday,
+  type AcademicFormValues,
+} from '../../schemas/academicSchema';
 import type {
   AcademicRecord,
   CreateAcademicRecordPayload,
@@ -18,6 +23,7 @@ import {
   toCreateAcademicPayload,
   toUpdateAcademicPayload,
 } from '../../utils/academicPayload';
+import { toDateInput } from '../../utils/format';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
 
 interface AcademicRecordDialogProps {
@@ -40,6 +46,10 @@ interface AcademicFormProps {
 function AcademicForm({ record, onCreate, onUpdate, onClose, onSaved }: AcademicFormProps) {
   const [issue, setIssue] = useState<ServerIssue | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const schema = useMemo(
+    () => buildAcademicSchema(record ? toDateInput(record.graduationDate) : ''),
+    [record],
+  );
 
   const {
     register,
@@ -47,7 +57,7 @@ function AcademicForm({ record, onCreate, onUpdate, onClose, onSaved }: Academic
     setError,
     formState: { errors, isSubmitting },
   } = useForm<AcademicFormValues>({
-    resolver: zodResolver(academicSchema),
+    resolver: zodResolver(schema),
     defaultValues: record ? academicToFormValues(record) : EMPTY_ACADEMIC_VALUES,
     mode: 'onTouched',
   });
@@ -107,10 +117,10 @@ function AcademicForm({ record, onCreate, onUpdate, onClose, onSaved }: Academic
       <FormField
         id="acad-graduationDate"
         label="Fecha de graduación"
-        hint="Opcional."
+        hint="Opcional. No puede ser posterior a hoy."
         error={errors.graduationDate?.message}
       >
-        {(control) => <input type="date" {...control} {...register('graduationDate')} />}
+        {(control) => <input type="date" max={localToday()} {...control} {...register('graduationDate')} />}
       </FormField>
 
       <FormField

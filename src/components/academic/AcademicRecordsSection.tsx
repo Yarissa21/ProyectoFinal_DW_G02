@@ -168,6 +168,11 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
 
   const closeDialog = () => setDialog(null);
 
+  const handleSaved = (message: string) => {
+    setDialog(null);
+    setNotice(message);
+  };
+
   const openCreate = () => {
     setNotice(null);
     setSelected(null);
@@ -342,30 +347,37 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
       {renderContent()}
 
       <AcademicRecordDialog
-        key={dialog === 'edit' ? selected?.id : 'create'}
+        key="academic-create"
         employeeId={employeeId}
-        record={dialog === 'edit' ? selected : null}
-        open={dialog === 'create' || dialog === 'edit'}
+        record={null}
+        open={dialog === 'create'}
         onClose={closeDialog}
-        onSaved={(message) => {
-          setDialog(null);
-          setNotice(message);
-        }}
+        onSaved={handleSaved}
       />
 
       {selected && (
-        <AcademicDeleteDialog
-          key={selected.id}
-          employeeId={employeeId}
-          record={selected}
-          open={dialog === 'delete'}
-          onClose={closeDialog}
-          onDeleted={() => {
-            setDialog(null);
-            setNotice('Antecedente académico eliminado correctamente.');
-            if (currentItems.length === 1 && page > 1) setPage(page - 1);
-          }}
-        />
+        <>
+          <AcademicRecordDialog
+            key={`academic-edit-${selected.id}`}
+            employeeId={employeeId}
+            record={selected}
+            open={dialog === 'edit'}
+            onClose={closeDialog}
+            onSaved={handleSaved}
+          />
+          <AcademicDeleteDialog
+            key={`academic-delete-${selected.id}`}
+            employeeId={employeeId}
+            record={selected}
+            open={dialog === 'delete'}
+            onClose={closeDialog}
+            onDeleted={() => {
+              setDialog(null);
+              setNotice('Antecedente académico eliminado correctamente.');
+              if (currentItems.length === 1 && page > 1) setPage(page - 1);
+            }}
+          />
+        </>
       )}
     </section>
   );

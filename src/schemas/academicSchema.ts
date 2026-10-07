@@ -20,3 +20,28 @@ export const academicSchema = z.object({
 });
 
 export type AcademicFormValues = z.infer<typeof academicSchema>;
+
+/** Fecha de hoy (zona horaria local) en formato AAAA-MM-DD, igual que devuelve un <input type="date">. */
+export function localToday(): string {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+/**
+ * La fecha de graduación no puede ser posterior a hoy. Si el antecedente ya traía una fecha
+ * (original) y no se modificó, se respeta para no bloquear la edición de otros campos.
+ */
+export function buildAcademicSchema(originalGraduationDate = '', today: string = localToday()) {
+  return academicSchema.superRefine((values, ctx) => {
+    const date = values.graduationDate;
+    if (DATE_PATTERN.test(date) && date !== originalGraduationDate && date > today) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['graduationDate'],
+        message: 'La fecha de graduación no puede ser posterior a hoy.',
+      });
+    }
+  });
+}
