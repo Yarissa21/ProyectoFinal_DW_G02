@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { EmploymentStatusBadge } from '../components/EmployeeBadges';
+import AcademicRecordsSection from '../components/academic/AcademicRecordsSection';
 import BackLink from '../components/employees/BackLink';
 import EmployeeDeleteDialog from '../components/employees/EmployeeDeleteDialog';
 import EmployeeDetailCard from '../components/employees/EmployeeDetailCard';
@@ -89,6 +90,8 @@ function EmployeeDetailPage() {
       </div>
 
       <EmployeeDetailCard employee={employee} />
+
+      <AcademicRecordsSection employeeId={employee.id} employeeName={fullName(employee)} />
 
       <EmploymentHistory employeeId={employee.id} />
 
