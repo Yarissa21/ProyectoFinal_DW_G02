@@ -14,6 +14,7 @@ import EmployeesPage from './pages/EmployeesPage';
 import EmployeeDetailPage from './pages/EmployeeDetailPage';
 import EmployeeCreatePage from './pages/EmployeeCreatePage';
 import EmployeeEditPage from './pages/EmployeeEditPage';
+import SystemStatusPage from './pages/SystemStatusPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -36,8 +37,7 @@ function App() {
 
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/empleados" element={<EmployeesPage />} />
-              <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
+              <Route path="/sistema" element={<SystemStatusPage />} />
               <Route path="/empleados" element={<EmployeesPage />} />
               <Route path="/empleados/nuevo" element={<EmployeeCreatePage />} />
               <Route path="/empleados/:id" element={<EmployeeDetailPage />} />

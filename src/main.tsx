@@ -9,6 +9,7 @@ import { ApiError } from './services/http.ts'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      networkMode: 'always',
       staleTime: 60_000,
       refetchOnWindowFocus: false,
       retry: (failureCount, error) =>
@@ -16,7 +17,7 @@ const queryClient = new QueryClient({
         (error.status === 0 || error.status === 503) &&
         failureCount < 1,
     },
-    mutations: { retry: 0 },
+    mutations: { networkMode: 'always', retry: 0 },
   },
 })
 

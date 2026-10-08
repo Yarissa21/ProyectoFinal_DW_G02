@@ -15,7 +15,7 @@ const MESSAGE_BY_STATUS: Record<number, string> = {
   409: 'La operación entra en conflicto con el estado actual de los datos.',
   422: 'La operación no cumple una regla de negocio.',
   429: 'Demasiadas solicitudes. Espera un minuto e inténtalo de nuevo.',
-  500: 'Ocurrió un error interno. Si persiste, reporta el identificador de la solicitud.',
+  500: 'Ocurrió un error interno. Inténtalo de nuevo en unos momentos.',
   503: 'El servicio no está disponible temporalmente. Inténtalo de nuevo en unos momentos.',
 };
 
