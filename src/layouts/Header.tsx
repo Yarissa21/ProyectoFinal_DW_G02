@@ -22,6 +22,17 @@ const DESKTOP_QUERY = '(min-width: 1024px)';
 
 const focusClass = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-white';
 
+function BrandMark() {
+  return (
+    <span
+      aria-hidden="true"
+      className="grid size-9 shrink-0 place-items-center rounded-xl bg-amber-400 text-sm font-extrabold text-slate-900"
+    >
+      RH
+    </span>
+  );
+}
+
 function MenuIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -95,7 +106,7 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-slate-900 text-white">
+      <header className="border-b-2 border-amber-400 bg-slate-900 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <button
@@ -109,7 +120,8 @@ function AppLayout() {
             >
               <MenuIcon />
             </button>
-            <span className="text-lg font-bold">RRHH</span>
+            <BrandMark />
+            <span className="text-lg font-bold tracking-tight">RRHH</span>
             {currentItem && (
               <span className="truncate text-sm font-medium text-white/80 lg:hidden">{currentItem.label}</span>
             )}
@@ -123,7 +135,7 @@ function AppLayout() {
                 end
                 className={({ isActive }) =>
                   `rounded-md px-3 py-1.5 text-sm font-medium ${focusClass} ${
-                    isActive ? 'bg-white/20' : 'text-white/80 hover:bg-white/10'
+                    isActive ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -163,7 +175,10 @@ function AppLayout() {
             className="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85%] flex-col overflow-y-auto bg-slate-900 p-4 text-white shadow-xl"
           >
             <div className="flex items-center justify-between">
-              <span className="text-lg font-bold">RRHH</span>
+              <span className="flex items-center gap-3">
+                <BrandMark />
+                <span className="text-lg font-bold tracking-tight">RRHH</span>
+              </span>
               <button
                 ref={closeButtonRef}
                 type="button"
@@ -184,7 +199,7 @@ function AppLayout() {
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
                     `rounded-md px-3 py-2.5 text-base font-medium ${focusClass} ${
-                      isActive ? 'bg-white/20' : 'text-white/80 hover:bg-white/10'
+                      isActive ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
                     }`
                   }
                 >

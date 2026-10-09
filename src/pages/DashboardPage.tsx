@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import EmptyState from '../components/EmptyState';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingState from '../components/LoadingState';
+import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import { useDashboard } from '../hooks/useDashboard';
 import { describeError } from '../services/errorMessages';
@@ -31,14 +32,15 @@ function WorkforceSection({ workforce }: { workforce: DashboardWorkforce }) {
 
   return (
     <section aria-labelledby="group-workforce" className="space-y-3">
-      <h2 id="group-workforce" className="text-lg font-semibold text-slate-900">
+      <h2 id="group-workforce" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+        <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
         Personal
       </h2>
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total de empleados" value={formatCount(workforce.total)} />
-        <StatCard label="Activos" value={formatCount(workforce.active)} />
-        <StatCard label="Suspendidos" value={formatCount(workforce.suspended)} />
-        <StatCard label="Retirados" value={formatCount(workforce.retired)} />
+        <StatCard tone="brand" label="Total de empleados" value={formatCount(workforce.total)} />
+        <StatCard tone="success" label="Activos" value={formatCount(workforce.active)} />
+        <StatCard tone="warning" label="Suspendidos" value={formatCount(workforce.suspended)} />
+        <StatCard tone="danger" label="Retirados" value={formatCount(workforce.retired)} />
       </dl>
       <p className="text-sm">
         <Link
@@ -63,24 +65,21 @@ function DashboardPage() {
 
   return (
     <section aria-labelledby="dashboard-title" className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 id="dashboard-title" className="text-2xl font-bold text-slate-900">
-            Dashboard
-          </h1>
-          <p aria-live="polite" className="mt-1 min-h-5 text-sm text-slate-600">
-            {statusText}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => void query.refetch()}
-          disabled={query.isFetching}
-          className={secondaryButtonClass}
-        >
-          Actualizar
-        </button>
-      </div>
+      <PageHeader
+        id="dashboard-title"
+        title="Dashboard"
+        description={statusText}
+        actions={
+          <button
+            type="button"
+            onClick={() => void query.refetch()}
+            disabled={query.isFetching}
+            className={secondaryButtonClass}
+          >
+            Actualizar
+          </button>
+        }
+      />
 
       {query.isPending && <LoadingState label="Cargando indicadores…" />}
 

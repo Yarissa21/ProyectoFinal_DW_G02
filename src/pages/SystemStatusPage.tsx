@@ -1,6 +1,7 @@
 import { useIsFetching } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import ErrorAlert from '../components/ErrorAlert';
+import PageHeader from '../components/PageHeader';
 import StatusPanel from '../components/StatusPanel';
 import HealthPanel from '../components/system/HealthPanel';
 import PermissionPanel from '../components/system/PermissionPanel';
@@ -34,22 +35,20 @@ function SystemStatusPage() {
 
   return (
     <section aria-labelledby="system-title" className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 id="system-title" className="text-2xl font-bold text-slate-900">
-            Estado del sistema
-          </h1>
-          <p aria-live="polite" className="mt-1 min-h-5 text-sm text-slate-600">
-            {fetching > 0 ? 'Actualizando…' : ''}
-          </p>
-        </div>
-        <button type="button" onClick={refreshAll} disabled={fetching > 0} className={secondaryButtonClass}>
-          Verificar de nuevo
-        </button>
-      </div>
+      <PageHeader
+        id="system-title"
+        title="Estado del sistema"
+        description={fetching > 0 ? 'Actualizando…' : ''}
+        actions={
+          <button type="button" onClick={refreshAll} disabled={fetching > 0} className={secondaryButtonClass}>
+            Verificar de nuevo
+          </button>
+        }
+      />
 
       <section aria-labelledby="health-title" className="space-y-3">
-        <h2 id="health-title" className="text-lg font-semibold text-slate-900">
+        <h2 id="health-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
           Salud del API
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -60,7 +59,8 @@ function SystemStatusPage() {
       </section>
 
       <section aria-labelledby="permissions-title" className="space-y-3">
-        <h2 id="permissions-title" className="text-lg font-semibold text-slate-900">
+        <h2 id="permissions-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
           Permisos de tu sesión
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -80,7 +80,8 @@ function SystemStatusPage() {
       </section>
 
       <section aria-labelledby="catalogs-title" className="space-y-3">
-        <h2 id="catalogs-title" className="text-lg font-semibold text-slate-900">
+        <h2 id="catalogs-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
           Catálogos
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">

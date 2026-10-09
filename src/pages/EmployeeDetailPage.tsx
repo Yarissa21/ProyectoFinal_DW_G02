@@ -66,7 +66,8 @@ function EmployeeDetailPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <BackLink to="/empleados">Volver al listado</BackLink>
-          <h1 id="employee-title" className="mt-2 break-words text-2xl font-bold text-slate-900">
+          <span aria-hidden="true" className="mt-3 block h-1 w-10 rounded-full bg-amber-400" />
+          <h1 id="employee-title" className="mt-2 break-words text-2xl font-bold text-slate-900 sm:text-3xl">
             {fullName(employee)}
           </h1>
           <div className="mt-2">

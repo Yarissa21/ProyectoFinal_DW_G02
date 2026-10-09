@@ -11,6 +11,7 @@ import { describeError } from '../services/errorMessages';
 import type { EmployeeSortField } from '../types/employee';
 import { PAGE_SIZES } from '../utils/employeeLabels';
 import LoadingState from '../components/LoadingState';
+import PageHeader from '../components/PageHeader';
 
 const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
@@ -126,19 +127,16 @@ function EmployeesPage() {
 
   return (
     <section aria-labelledby="employees-title" className="space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 id="employees-title" className="text-2xl font-bold text-slate-900">
-            Empleados
-          </h1>
-          <p aria-live="polite" className="mt-1 min-h-5 text-sm text-slate-600">
-            {statusText}
-          </p>
-        </div>
-        <Link to="/empleados/nuevo" className={primaryButtonClass}>
-          Nuevo empleado
-        </Link>
-      </div>
+      <PageHeader
+        id="employees-title"
+        title="Empleados"
+        description={statusText}
+        actions={
+          <Link to="/empleados/nuevo" className={primaryButtonClass}>
+            + Nuevo empleado
+          </Link>
+        }
+      />
 
       <EmployeeFilters
         params={params}

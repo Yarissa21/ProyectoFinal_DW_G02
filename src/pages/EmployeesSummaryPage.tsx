@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import EmptyState from '../components/EmptyState';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingState from '../components/LoadingState';
+import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import { useEmployeesSummary } from '../hooks/useEmployees';
 import { describeError } from '../services/errorMessages';
@@ -22,7 +23,8 @@ function statusLabel(key: string): string {
 function CountList({ title, id, rows }: { title: string; id: string; rows: { key: string; label: string; count: number }[] }) {
   return (
     <section aria-labelledby={id} className="rounded-xl border border-slate-200 bg-white p-4">
-      <h2 id={id} className="text-lg font-semibold text-slate-900">
+      <h2 id={id} className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+        <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
         {title}
       </h2>
       {rows.length === 0 ? (
@@ -70,10 +72,11 @@ function SummaryContent({ data }: { data: EmployeeSummaryReport }) {
   return (
     <div className="space-y-6">
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total de empleados" value={formatCount(data.totalEmployees)} />
-        <StatCard label="Activos" value={formatCount(data.activeEmployees)} />
-        <StatCard label="Inactivos" value={formatCount(data.inactiveEmployees)} />
+        <StatCard tone="brand" label="Total de empleados" value={formatCount(data.totalEmployees)} />
+        <StatCard tone="success" label="Activos" value={formatCount(data.activeEmployees)} />
+        <StatCard tone="danger" label="Inactivos" value={formatCount(data.inactiveEmployees)} />
         <StatCard
+          tone="info"
           label="Planilla mensual base"
           value={<span className="text-2xl break-words">{formatMoney(data.monthlyPayrollBase)}</span>}
         />
@@ -97,24 +100,21 @@ function EmployeesSummaryPage() {
 
   return (
     <section aria-labelledby="summary-title" className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 id="summary-title" className="text-2xl font-bold text-slate-900">
-            Resumen de empleados
-          </h1>
-          <p aria-live="polite" className="mt-1 min-h-5 text-sm text-slate-600">
-            {statusText}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => void query.refetch()}
-          disabled={query.isFetching}
-          className={secondaryButtonClass}
-        >
-          Actualizar
-        </button>
-      </div>
+      <PageHeader
+        id="summary-title"
+        title="Resumen de empleados"
+        description={statusText}
+        actions={
+          <button
+            type="button"
+            onClick={() => void query.refetch()}
+            disabled={query.isFetching}
+            className={secondaryButtonClass}
+          >
+            Actualizar
+          </button>
+        }
+      />
 
       {query.isPending && <LoadingState label="Cargando reporte…" />}
 
