@@ -1,75 +1,66 @@
-# React + TypeScript + Vite
+# Proyecto Final Desarrollo Web — Sistema de RRHH (Grupo G02)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Universidad Mariano Gálvez de Guatemala · Curso 036 Desarrollo Web · Centro Universitario Chiquimulilla
 
-Currently, two official plugins are available:
+Frontend (SPA) que consume la instancia **api-g02** de API-RH. Incluye el núcleo común del proyecto y la especialización de G02: ciclo de vida y desarrollo (empleados y antecedentes académicos).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Versión publicada
 
-## React Compiler
+**https://proyectofinal-dw-g02.netlify.app/**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+React 18 · Vite · TypeScript · React Router · TanStack Query · Zustand · react-hook-form + Zod · TailwindCSS · Axios
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Instalación
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Requisitos: Node.js 18 o superior y npm.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+git clone https://github.com/Yarissa21/ProyectoFinal_DW_G02.git
+cd ProyectoFinal_DW_G02
+npm install
+cp .env.example .env    # en Windows: copy .env.example .env
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+La aplicación se abre en http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Variables de entorno
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Variable | Descripción |
+|---|---|
+| `VITE_API_BASE_URL` | URL base de la instancia asignada (api-g02) |
 
-```
+`.env.example` solo contiene un placeholder. El archivo `.env` se crea en el proyecto con la url de la api real.
+
+## Comandos
+
+| Comando | Acción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Sirve la build localmente |
+| `npm run lint` | Análisis con ESLint |
+
+## Cómo probar cada rol
+
+Se inicia sesión con las cuentas que estan disponibles y según su rol muestran lo siguiente:
+
+**ADMIN**
+- Dashboard administrativo.
+- Crear, listar, ver y editar empleados.
+- Cambiar estado laboral y consultar el historial laboral (solo lectura).
+- Registrar, editar y eliminar antecedentes académicos.
+- Dar de baja a un empleado (solo ADMIN puede).
+- Consultar los reportes de resumen de empleados y consolidado académico.
+
+**HR_MANAGER**
+- Mismo flujo que ADMIN.
+- Al intentar dar de baja a un empleado se muestra un mensaje de 403, porque esa acción es exclusiva de ADMIN (No deberia de verse el botón de dar de baja).
+
+**EMPLOYEE**
+- Pantalla de inicio con su propio perfil y edición de contacto.
+- Consulta de sus antecedentes académicos.
+- No tiene acceso al dashboard ni al listado de empleados (403).
+- Si no tiene perfil vinculado, ve un mensaje claro (`EMPLOYEE_PROFILE_NOT_LINKED`).
