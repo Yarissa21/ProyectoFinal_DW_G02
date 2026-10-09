@@ -51,8 +51,8 @@ function StatusForm({ employee, onSubmit, onClose, onSaved }: StatusFormProps) {
   const submit = handleSubmit(async (values) => {
     setIssue(null);
     const payload: UpdateEmploymentStatusPayload = { status: values.status };
-    if (values.status === 'RETIRED' && values.terminationDate) payload.terminationDate = values.terminationDate;
-
+    if (values.status === 'RETIRED') payload.terminationDate = values.terminationDate;
+    
     try {
       await onSubmit(payload);
       onSaved();
@@ -90,7 +90,7 @@ function StatusForm({ employee, onSubmit, onClose, onSaved }: StatusFormProps) {
         <FormField
           id="status-termination"
           label="Fecha de baja"
-          hint="Opcional."
+          required
           error={errors.terminationDate?.message}
         >
           {(field) => <input type="date" {...field} {...register('terminationDate')} />}

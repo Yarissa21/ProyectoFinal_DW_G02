@@ -21,5 +21,12 @@ export function buildEmployeeStatusSchema(currentStatus: EmploymentStatus) {
         message: 'Selecciona un estado distinto al actual.',
       });
     }
+    if (values.status === 'RETIRED' && values.terminationDate === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['terminationDate'],
+        message: 'Selecciona la fecha de baja.',
+      });
+    }
   });
 }

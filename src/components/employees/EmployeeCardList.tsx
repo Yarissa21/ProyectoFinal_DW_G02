@@ -16,7 +16,7 @@ function EmployeeCardList({ items }: EmployeeCardListProps) {
       {items.map((employee) => {
         const name = fullName(employee);
         return (
-          <li key={employee.id} className="rounded-xl border border-slate-200 bg-white p-4">
+          <li key={employee.id} className="rounded-xl border border-slate-200 border-l-4 border-l-blue-500 bg-white p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <Link to={`/empleados/${employee.id}`} className={`${linkClass} break-words font-semibold`}>

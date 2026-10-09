@@ -265,7 +265,8 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
     <section aria-labelledby="academic-title" className="space-y-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 id="academic-title" className="text-lg font-semibold text-slate-900">
+          <h2 id="academic-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
             Antecedentes académicos
           </h2>
           <p className="text-sm text-slate-600">Títulos, certificaciones y cursos del empleado.</p>

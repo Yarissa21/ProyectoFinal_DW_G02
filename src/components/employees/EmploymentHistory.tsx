@@ -162,7 +162,8 @@ function EmploymentHistory({ employeeId }: EmploymentHistoryProps) {
   return (
     <section aria-labelledby="history-title" className="space-y-3">
       <div>
-        <h2 id="history-title" className="text-lg font-semibold text-slate-900">
+        <h2 id="history-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
           Historial laboral
         </h2>
         <p className="text-sm text-slate-600">Los registros del historial no se pueden editar ni eliminar.</p>

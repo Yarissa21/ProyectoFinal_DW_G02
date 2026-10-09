@@ -19,7 +19,7 @@ interface SortHeaderProps {
   onSort: (field: EmployeeSortField) => void;
 }
 
-const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
+const thClass = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700';
 const linkClass =
   'rounded text-blue-800 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700';
 
@@ -33,7 +33,7 @@ function SortHeader({ field, label, sortBy, sortOrder, onSort }: SortHeaderProps
       <button
         type="button"
         onClick={() => onSort(field)}
-        className="inline-flex items-center gap-1.5 rounded font-semibold hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+        className="inline-flex items-center gap-1.5 rounded font-semibold uppercase tracking-wide hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
       >
         {label}
         <span aria-hidden="true" className={active ? 'text-slate-900' : 'text-slate-400'}>
@@ -49,7 +49,7 @@ function EmployeeTable({ items, sortBy, sortOrder, onSort }: EmployeeTableProps)
     <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white md:block">
       <table className="w-full min-w-[56rem] text-sm">
         <caption className="sr-only">Lista de empleados</caption>
-        <thead className="border-b border-slate-200 bg-slate-50">
+        <thead className="border-b border-blue-100 bg-blue-50">
           <tr>
             <SortHeader field="lastName" label="Empleado" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
             <th scope="col" className={thClass}>
@@ -74,9 +74,9 @@ function EmployeeTable({ items, sortBy, sortOrder, onSort }: EmployeeTableProps)
           {items.map((employee) => {
             const name = fullName(employee);
             return (
-              <tr key={employee.id} className="hover:bg-slate-50">
+              <tr key={employee.id} className="hover:bg-blue-50/60">
                 <td className="px-4 py-3">
-                  <Link to={`/empleados/${employee.id}`} className={`${linkClass} font-medium`}>
+                  <Link to={`/empleados/${employee.id}`} className={`${linkClass} font-semibold`}>
                     {name}
                   </Link>
                   <div className="text-xs text-slate-600">{employee.email || 'Sin correo'}</div>

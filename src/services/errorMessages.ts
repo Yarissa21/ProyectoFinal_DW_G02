@@ -4,6 +4,7 @@ const MESSAGE_BY_CODE: Record<string, string> = {
   INVALID_CREDENTIALS: 'El correo o la contraseña son incorrectos.',
   EMPLOYEE_PROFILE_NOT_LINKED:
     'Tu cuenta aún no está vinculada a un perfil de empleado. Contacta al responsable.',
+  EMPLOYEE_UNIQUE_CONSTRAINT: 'Ya existe un empleado con ese DPI o correo electrónico.',
 };
 
 const MESSAGE_BY_STATUS: Record<number, string> = {

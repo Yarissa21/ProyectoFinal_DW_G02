@@ -39,7 +39,8 @@ export const employeeSchema = z.object({
   email: z
     .string()
     .trim()
-    .refine((value) => value === '' || z.string().email().safeParse(value).success, 'Ingresa un correo válido'),
+    .min(1, 'Ingresa el correo electrónico')
+    .email('Ingresa un correo válido'),
   baseSalary: z
     .string()
     .trim()
