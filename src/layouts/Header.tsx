@@ -13,6 +13,7 @@ const navItems: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/inicio', label: 'Inicio', allowedRoles: ['EMPLOYEE'] },
   { path: '/empleados', label: 'Empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
+  { path: '/empleados/resumen', label: 'Resumen empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
 ];
 
@@ -40,6 +41,7 @@ function AppLayout() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end
                 className={({ isActive }) =>
                   `rounded-md px-3 py-1.5 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
                     isActive ? 'bg-white/20' : 'text-white/80 hover:bg-white/10'
