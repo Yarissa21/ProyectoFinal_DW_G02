@@ -12,6 +12,8 @@ import {
 import type { EmployeeCatalogs } from '../../types/catalog';
 import type { CreateEmployeePayload, Employee, UpdateEmployeePayload } from '../../types/employee';
 import { EMPTY_FORM_VALUES, employeeToFormValues, toCreatePayload, toUpdatePayload } from '../../utils/employeePayload';
+import { ApiError } from '../../services/http';
+import { findDuplicateFields, type DuplicateField } from '../../utils/employeeDuplicates';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
 
 type EmployeeFormProps = {
@@ -82,7 +84,32 @@ function EmployeeForm(props: EmployeeFormProps) {
     return options;
   }, [catalogs, employee, departmentId]);
 
-  const showServerError = (error: unknown) => {
+  const markDuplicates = async (values: EmployeeFormValues) => {
+    const fields = await findDuplicateFields(values, employee?.id).catch((): DuplicateField[] => []);
+
+    if (fields.length === 0) {
+      const message = 'Este DPI o correo ya está registrado en otro empleado.';
+      setError('dpi', { type: 'server', message }, { shouldFocus: true });
+      setError('email', { type: 'server', message });
+      return;
+    }
+    if (fields.includes('dpi')) {
+      setError('dpi', { type: 'server', message: 'Ya existe un empleado con este DPI.' }, { shouldFocus: true });
+    }
+    if (fields.includes('email')) {
+      setError(
+        'email',
+        { type: 'server', message: 'Ya existe un empleado con este correo.' },
+        { shouldFocus: !fields.includes('dpi') },
+      );
+    }
+  };
+
+  const showServerError = async (error: unknown, values: EmployeeFormValues) => {
+    if (error instanceof ApiError && error.status === 409 && error.code === 'EMPLOYEE_UNIQUE_CONSTRAINT') {
+      await markDuplicates(values);
+      return;
+    }
     setIssue(
       resolveServerIssue(error, EMPLOYEE_FORM_FIELDS, (field, message, focus) =>
         setError(field, { type: 'server', message }, { shouldFocus: focus }),
@@ -105,7 +132,7 @@ function EmployeeForm(props: EmployeeFormProps) {
       }
       await props.onSubmit(payload);
     } catch (error) {
-      showServerError(error);
+      await showServerError(error, values);
     }
   });
 
@@ -146,7 +173,7 @@ function EmployeeForm(props: EmployeeFormProps) {
         <FormField id="emp-phone" label="Teléfono" error={errors.phone?.message}>
           {(control) => <input type="tel" {...control} {...register('phone')} />}
         </FormField>
-        <FormField id="emp-email" label="Correo electrónico" error={errors.email?.message}>
+        <FormField id="emp-email" label="Correo electrónico" required error={errors.email?.message}>
           {(control) => <input type="email" {...control} {...register('email')} />}
         </FormField>
         <FormField id="emp-address" label="Dirección" required wide error={errors.address?.message}>
