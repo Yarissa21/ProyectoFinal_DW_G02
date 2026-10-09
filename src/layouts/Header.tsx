@@ -18,7 +18,7 @@ const navItems: NavItem[] = [
   { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
 ];
 
-const DESKTOP_QUERY = '(min-width: 768px)';
+const DESKTOP_QUERY = '(min-width: 1024px)';
 
 const focusClass = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-white';
 
@@ -105,17 +105,17 @@ function AppLayout() {
               aria-label="Abrir menú"
               aria-expanded={menuOpen}
               aria-controls="menu-movil"
-              className={`rounded-md border border-white/30 p-2 hover:bg-white/10 md:hidden ${focusClass}`}
+              className={`rounded-md border border-white/30 p-2 hover:bg-white/10 lg:hidden ${focusClass}`}
             >
               <MenuIcon />
             </button>
             <span className="text-lg font-bold">RRHH</span>
             {currentItem && (
-              <span className="truncate text-sm font-medium text-white/80 md:hidden">{currentItem.label}</span>
+              <span className="truncate text-sm font-medium text-white/80 lg:hidden">{currentItem.label}</span>
             )}
           </div>
 
-          <nav aria-label="Principal" className="hidden gap-1 md:flex">
+          <nav aria-label="Principal" className="hidden gap-1 lg:flex">
             {visibleItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -133,7 +133,7 @@ function AppLayout() {
           </nav>
 
           {user && (
-            <div className="hidden items-center gap-3 text-sm md:flex">
+            <div className="hidden items-center gap-3 text-sm lg:flex">
               <span>
                 {user.firstName} {user.lastName}
               </span>
@@ -153,7 +153,7 @@ function AppLayout() {
       </header>
 
       {menuOpen && (
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <div aria-hidden="true" onClick={closeMenu} className="fixed inset-0 z-40 bg-black/60" />
           <div
             id="menu-movil"
