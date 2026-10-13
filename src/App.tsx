@@ -16,6 +16,8 @@ import EmployeeCreatePage from './pages/EmployeeCreatePage';
 import EmployeeEditPage from './pages/EmployeeEditPage';
 import SystemStatusPage from './pages/SystemStatusPage';
 import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
+import MyProfilePage from './pages/MyProfilePage';
+import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -48,6 +50,8 @@ function App() {
 
             <Route element={<RoleGuard allowedRoles={['EMPLOYEE']} />}>
               <Route path="/inicio" element={<EmployeeHomePage />} />
+              <Route path="/mi-perfil" element={<MyProfilePage />} />
+              <Route path="/mis-academicos" element={<MyAcademicRecordsPage />} />
             </Route>
           </Route>
         </Route>
