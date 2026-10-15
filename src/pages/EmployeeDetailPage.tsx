@@ -79,6 +79,11 @@ function EmployeeDetailPage() {
           <Link to={`/empleados/${employee.id}/editar`} className={primaryButtonClass}>
             Editar
           </Link>
+          {isAdmin && (
+            <Link to={`/empleados/${employee.id}/usuario`} className={secondaryButtonClass}>
+              {employee.user ? 'Cambiar usuario' : 'Vincular usuario'}
+            </Link>
+          )}
           <button type="button" onClick={() => setDialog('status')} className={secondaryButtonClass}>
             Cambiar estado
           </button>

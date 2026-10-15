@@ -12,6 +12,7 @@ import { useAuthStore } from './store/authStore';
 import { homePathForRole } from './utils/roles';
 import EmployeesPage from './pages/EmployeesPage';
 import EmployeeDetailPage from './pages/EmployeeDetailPage';
+import EmployeeLinkUserPage from './pages/EmployeeLinkUserPage';
 import EmployeeCreatePage from './pages/EmployeeCreatePage';
 import EmployeeEditPage from './pages/EmployeeEditPage';
 import SystemStatusPage from './pages/SystemStatusPage';
@@ -38,6 +39,10 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/sistema" element={<SystemStatusPage />} />
+
+            <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
+              <Route path="/empleados/:id/usuario" element={<EmployeeLinkUserPage />} />
+            </Route>
 
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
