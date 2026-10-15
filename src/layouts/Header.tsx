@@ -17,7 +17,7 @@ const navItems: NavItem[] = [
   { path: '/mis-academicos', label: 'Mis académicos', allowedRoles: ['EMPLOYEE'] },
   { path: '/empleados', label: 'Empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/empleados/resumen', label: 'Resumen empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
-  { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
+  { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
 ];
 
 const DESKTOP_QUERY = '(min-width: 1024px)';

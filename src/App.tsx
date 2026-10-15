@@ -37,10 +37,10 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomeRedirect />} />
+            <Route path="/sistema" element={<SystemStatusPage />} />
 
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/sistema" element={<SystemStatusPage />} />
               <Route path="/empleados" element={<EmployeesPage />} />
               <Route path="/empleados/nuevo" element={<EmployeeCreatePage />} />
               <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
