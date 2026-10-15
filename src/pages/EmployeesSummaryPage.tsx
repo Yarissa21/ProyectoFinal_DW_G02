@@ -71,14 +71,15 @@ function SummaryContent({ data }: { data: EmployeeSummaryReport }) {
 
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard tone="brand" label="Total de empleados" value={formatCount(data.totalEmployees)} />
-        <StatCard tone="success" label="Activos" value={formatCount(data.activeEmployees)} />
-        <StatCard tone="danger" label="Inactivos" value={formatCount(data.inactiveEmployees)} />
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard compact tone="brand" label="Total de empleados" value={formatCount(data.totalEmployees)} />
+        <StatCard compact tone="success" label="Activos" value={formatCount(data.activeEmployees)} />
+        <StatCard compact tone="danger" label="Inactivos" value={formatCount(data.inactiveEmployees)} />
         <StatCard
+          compact
           tone="info"
           label="Planilla mensual base"
-          value={<span className="text-2xl break-words">{formatMoney(data.monthlyPayrollBase)}</span>}
+          value={<span className="text-xl break-words">{formatMoney(data.monthlyPayrollBase)}</span>}
         />
       </dl>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
