@@ -13,7 +13,7 @@ import {
 } from '../../schemas/employeeStatusSchema';
 import type { Employee, UpdateEmploymentStatusPayload } from '../../types/employee';
 import { EMPLOYMENT_STATUS_LABELS, EMPLOYMENT_STATUS_VALUES } from '../../utils/employeeLabels';
-import { fullName } from '../../utils/format';
+import { fullName, formatDate } from '../../utils/format';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
 
 interface EmployeeStatusDialogProps {
@@ -47,6 +47,7 @@ function StatusForm({ employee, onSubmit, onClose, onSaved }: StatusFormProps) {
   });
 
   const status = useWatch({ control, name: 'status' });
+  const terminationDate = useWatch({ control, name: 'terminationDate' });
 
   const submit = handleSubmit(async (values) => {
     setIssue(null);
@@ -95,6 +96,18 @@ function StatusForm({ employee, onSubmit, onClose, onSaved }: StatusFormProps) {
         >
           {(field) => <input type="date" {...field} {...register('terminationDate')} />}
         </FormField>
+      )}
+
+      {status !== employee.status && (
+        <div role="status" className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-semibold">Antes de confirmar</p>
+          <p className="mt-1">
+            {fullName(employee)} pasará de {EMPLOYMENT_STATUS_LABELS[employee.status]} a{' '}
+            {EMPLOYMENT_STATUS_LABELS[status]}
+            {status === 'RETIRED' && terminationDate ? ` con fecha de baja ${formatDate(terminationDate)}` : ''}. Este
+            cambio quedará registrado en el historial laboral, que no se puede editar ni eliminar.
+          </p>
+        </div>
       )}
 
       {issue && <ServerIssueAlert issue={issue} onRetry={() => void submit()} />}

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { EmploymentStatusBadge } from '../components/EmployeeBadges';
 import AcademicRecordsSection from '../components/academic/AcademicRecordsSection';
 import BackLink from '../components/employees/BackLink';
+import DetailTabs, { type DetailTab } from '../components/employees/DetailTabs';
 import EmployeeDeleteDialog from '../components/employees/EmployeeDeleteDialog';
 import EmployeeDetailCard from '../components/employees/EmployeeDetailCard';
 import EmployeeStatusDialog from '../components/employees/EmployeeStatusDialog';
@@ -15,6 +16,14 @@ import { useAuthStore } from '../store/authStore';
 import { fullName } from '../utils/format';
 
 type OpenDialog = 'status' | 'delete' | null;
+type DetailSection = 'info' | 'academic' | 'history';
+
+const TAB_PREFIX = 'employee-detail';
+const TABS: DetailTab[] = [
+  { id: 'info', label: 'Información' },
+  { id: 'academic', label: 'Antecedentes' },
+  { id: 'history', label: 'Historial' },
+];
 
 const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
@@ -33,6 +42,7 @@ function EmployeeDetailPage() {
     () => (location.state as { notice?: string } | null)?.notice,
   );
   const [dialog, setDialog] = useState<OpenDialog>(null);
+  const [section, setSection] = useState<DetailSection>('info');
 
   useEffect(() => {
     if ((location.state as { notice?: string } | null)?.notice) {
@@ -79,6 +89,11 @@ function EmployeeDetailPage() {
           <Link to={`/empleados/${employee.id}/editar`} className={primaryButtonClass}>
             Editar
           </Link>
+          {isAdmin && (
+            <Link to={`/empleados/${employee.id}/usuario`} className={secondaryButtonClass}>
+              {employee.user ? 'Cambiar usuario' : 'Vincular usuario'}
+            </Link>
+          )}
           <button type="button" onClick={() => setDialog('status')} className={secondaryButtonClass}>
             Cambiar estado
           </button>
@@ -90,11 +105,22 @@ function EmployeeDetailPage() {
         </div>
       </div>
 
-      <EmployeeDetailCard employee={employee} />
-
-      <AcademicRecordsSection employeeId={employee.id} employeeName={fullName(employee)} />
-
-      <EmploymentHistory employeeId={employee.id} />
+      <div className="space-y-4">
+        <DetailTabs
+          idPrefix={TAB_PREFIX}
+          label="Secciones del empleado"
+          tabs={TABS}
+          active={section}
+          onChange={(id) => setSection(id as DetailSection)}
+        />
+        <div role="tabpanel" id={`${TAB_PREFIX}-panel-${section}`} aria-labelledby={`${TAB_PREFIX}-tab-${section}`}>
+          {section === 'info' && <EmployeeDetailCard employee={employee} />}
+          {section === 'academic' && (
+            <AcademicRecordsSection employeeId={employee.id} employeeName={fullName(employee)} />
+          )}
+          {section === 'history' && <EmploymentHistory employeeId={employee.id} />}
+        </div>
+      </div>
 
       <EmployeeStatusDialog
         employee={employee}

@@ -4,6 +4,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormField from './FormField';
 import ServerIssueAlert from './ServerIssueAlert';
+import UserSelectField from './UserSelectField';
 import {
   buildEmployeeSchema,
   EMPLOYEE_FORM_FIELDS,
@@ -15,6 +16,7 @@ import { EMPTY_FORM_VALUES, employeeToFormValues, toCreatePayload, toUpdatePaylo
 import { ApiError } from '../../services/http';
 import { findDuplicateFields, type DuplicateField } from '../../utils/employeeDuplicates';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
+import { useAuthStore } from '../../store/authStore';
 
 type EmployeeFormProps = {
   catalogs: EmployeeCatalogs;
@@ -44,6 +46,8 @@ function EmployeeForm(props: EmployeeFormProps) {
   const { catalogs, cancelTo, mode, employee } = props;
   const [issue, setIssue] = useState<ServerIssue | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [userId, setUserId] = useState('');
+  const isAdmin = useAuthStore((state) => state.user?.role.code === 'ADMIN');
 
   const schema = useMemo(
     () => buildEmployeeSchema(catalogs, employee ? employeeToFormValues(employee) : undefined),
@@ -122,7 +126,9 @@ function EmployeeForm(props: EmployeeFormProps) {
     setInfo(null);
     try {
       if (props.mode === 'create') {
-        await props.onSubmit(toCreatePayload(values));
+        const payload = toCreatePayload(values);
+        if (userId) payload.userId = userId;
+        await props.onSubmit(payload);
         return;
       }
       const payload = toUpdatePayload(values, props.employee);
@@ -239,6 +245,24 @@ function EmployeeForm(props: EmployeeFormProps) {
           {(control) => <input type="date" {...control} {...register('hireDate')} />}
         </FormField>
       </Fieldset>
+
+      {mode === 'create' && isAdmin && (
+        <Fieldset title="Cuenta de acceso">
+          <UserSelectField
+            id="emp-userId"
+            label="Usuario vinculado"
+            hint="Opcional. Se muestran las cuentas activas con rol de empleado."
+            value={userId}
+            onChange={setUserId}
+            getDefaults={() => ({
+              email: getValues('email'),
+              firstName: getValues('firstName'),
+              lastName: getValues('lastName'),
+            })}
+            wide
+          />
+        </Fieldset>
+      )}
 
       {issue && <ServerIssueAlert issue={issue} onRetry={() => void submit()} />}
 
