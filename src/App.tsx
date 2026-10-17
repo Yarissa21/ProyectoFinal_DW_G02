@@ -19,6 +19,7 @@ import SystemStatusPage from './pages/SystemStatusPage';
 import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
 import MyProfilePage from './pages/MyProfilePage';
 import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
+import AcademicSummaryPage from './pages/AcademicSummaryPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -51,6 +52,7 @@ function App() {
               <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
               <Route path="/empleados/:id/editar" element={<EmployeeEditPage />} />
               <Route path="/empleados/resumen" element={<EmployeesSummaryPage />} />
+              <Route path="/academicos/resumen" element={<AcademicSummaryPage />} />
             </Route>
 
             <Route element={<RoleGuard allowedRoles={['EMPLOYEE']} />}>
