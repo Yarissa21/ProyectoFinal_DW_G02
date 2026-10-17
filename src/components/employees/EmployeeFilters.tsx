@@ -45,6 +45,11 @@ function EmployeeFilters({ params, catalogs, hasActiveFilters, onChange, onClear
   const [syncedSearch, setSyncedSearch] = useState(urlSearch);
   const timer = useRef<number | undefined>(undefined);
 
+  const activeCount = [params.sortBy, params.status, params.recordStatus, params.departmentId, params.positionId].filter(
+    Boolean,
+  ).length;
+  const [open, setOpen] = useState(activeCount > 0);
+
   if (urlSearch !== syncedSearch) {
     setSyncedSearch(urlSearch);
     setSearchInput(urlSearch);
@@ -110,107 +115,123 @@ function EmployeeFilters({ params, catalogs, hasActiveFilters, onChange, onClear
           />
         </Field>
 
-        <Field id="emp-sort" label="Ordenar por">
-          <select
-            id="emp-sort"
-            value={params.sortBy ?? ''}
-            onChange={(event) => {
-              const sortBy = (event.target.value || undefined) as EmployeeSortField | undefined;
-              onChange({ sortBy, sortOrder: sortBy ? (params.sortOrder ?? 'asc') : undefined });
-            }}
-            className={controlClass}
-          >
-            <option value="">Predeterminado</option>
-            {SORT_FIELD_VALUES.map((field) => (
-              <option key={field} value={field}>
-                {SORT_FIELD_LABELS[field]}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-controls="emp-filtros-extra"
+          className="flex w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 sm:hidden"
+        >
+          <span>{activeCount > 0 ? `Filtros (${activeCount})` : 'Filtros'}</span>
+          <span aria-hidden="true">{open ? '▲' : '▼'}</span>
+        </button>
 
-        <Field id="emp-order" label="Orden">
-          <select
-            id="emp-order"
-            value={params.sortOrder ?? 'asc'}
-            disabled={!params.sortBy}
-            onChange={(event) => onChange({ sortOrder: event.target.value as SortOrder })}
-            className={controlClass}
-          >
-            <option value="asc">Ascendente</option>
-            <option value="desc">Descendente</option>
-          </select>
-        </Field>
+        <div
+          id="emp-filtros-extra"
+          className={`${open ? 'grid' : 'hidden'} grid-cols-1 gap-4 sm:contents`}
+        >
+          <Field id="emp-sort" label="Ordenar por">
+            <select
+              id="emp-sort"
+              value={params.sortBy ?? ''}
+              onChange={(event) => {
+                const sortBy = (event.target.value || undefined) as EmployeeSortField | undefined;
+                onChange({ sortBy, sortOrder: sortBy ? (params.sortOrder ?? 'asc') : undefined });
+              }}
+              className={controlClass}
+            >
+              <option value="">Predeterminado</option>
+              {SORT_FIELD_VALUES.map((field) => (
+                <option key={field} value={field}>
+                  {SORT_FIELD_LABELS[field]}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-        <Field id="emp-status" label="Estado laboral">
-          <select
-            id="emp-status"
-            value={params.status ?? ''}
-            onChange={(event) => onChange({ status: (event.target.value || undefined) as EmploymentStatus | undefined })}
-            className={controlClass}
-          >
-            <option value="">Todos</option>
-            {EMPLOYMENT_STATUS_VALUES.map((status) => (
-              <option key={status} value={status}>
-                {EMPLOYMENT_STATUS_LABELS[status]}
-              </option>
-            ))}
-          </select>
-        </Field>
+          <Field id="emp-order" label="Orden">
+            <select
+              id="emp-order"
+              value={params.sortOrder ?? 'asc'}
+              disabled={!params.sortBy}
+              onChange={(event) => onChange({ sortOrder: event.target.value as SortOrder })}
+              className={controlClass}
+            >
+              <option value="asc">Ascendente</option>
+              <option value="desc">Descendente</option>
+            </select>
+          </Field>
 
-        <Field id="emp-record" label="Expediente">
-          <select
-            id="emp-record"
-            value={params.recordStatus ?? ''}
-            onChange={(event) =>
-              onChange({ recordStatus: (event.target.value || undefined) as RecordStatus | undefined })
-            }
-            className={controlClass}
-          >
-            <option value="">Todos</option>
-            {RECORD_STATUS_VALUES.map((status) => (
-              <option key={status} value={status}>
-                {RECORD_STATUS_LABELS[status]}
-              </option>
-            ))}
-          </select>
-        </Field>
+          <Field id="emp-status" label="Estado laboral">
+            <select
+              id="emp-status"
+              value={params.status ?? ''}
+              onChange={(event) => onChange({ status: (event.target.value || undefined) as EmploymentStatus | undefined })}
+              className={controlClass}
+            >
+              <option value="">Todos</option>
+              {EMPLOYMENT_STATUS_VALUES.map((status) => (
+                <option key={status} value={status}>
+                  {EMPLOYMENT_STATUS_LABELS[status]}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-        <Field id="emp-department" label="Departamento">
-          <select
-            id="emp-department"
-            value={params.departmentId ?? ''}
-            disabled={catalogsUnavailable}
-            onChange={(event) =>
-              onChange({ departmentId: event.target.value || undefined, positionId: undefined })
-            }
-            className={controlClass}
-          >
-            <option value="">{catalogsUnavailable ? catalogPlaceholder : 'Todos'}</option>
-            {departments.map((department) => (
-              <option key={department.id} value={department.id}>
-                {department.name}
-              </option>
-            ))}
-          </select>
-        </Field>
+          <Field id="emp-record" label="Expediente">
+            <select
+              id="emp-record"
+              value={params.recordStatus ?? ''}
+              onChange={(event) =>
+                onChange({ recordStatus: (event.target.value || undefined) as RecordStatus | undefined })
+              }
+              className={controlClass}
+            >
+              <option value="">Todos</option>
+              {RECORD_STATUS_VALUES.map((status) => (
+                <option key={status} value={status}>
+                  {RECORD_STATUS_LABELS[status]}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-        <Field id="emp-position" label="Puesto">
-          <select
-            id="emp-position"
-            value={params.positionId ?? ''}
-            disabled={catalogsUnavailable}
-            onChange={(event) => onChange({ positionId: event.target.value || undefined })}
-            className={controlClass}
-          >
-            <option value="">{catalogsUnavailable ? catalogPlaceholder : 'Todos'}</option>
-            {positions.map((position) => (
-              <option key={position.id} value={position.id}>
-                {position.name}
-              </option>
-            ))}
-          </select>
-        </Field>
+          <Field id="emp-department" label="Departamento">
+            <select
+              id="emp-department"
+              value={params.departmentId ?? ''}
+              disabled={catalogsUnavailable}
+              onChange={(event) =>
+                onChange({ departmentId: event.target.value || undefined, positionId: undefined })
+              }
+              className={controlClass}
+            >
+              <option value="">{catalogsUnavailable ? catalogPlaceholder : 'Todos'}</option>
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field id="emp-position" label="Puesto">
+            <select
+              id="emp-position"
+              value={params.positionId ?? ''}
+              disabled={catalogsUnavailable}
+              onChange={(event) => onChange({ positionId: event.target.value || undefined })}
+              className={controlClass}
+            >
+              <option value="">{catalogsUnavailable ? catalogPlaceholder : 'Todos'}</option>
+              {positions.map((position) => (
+                <option key={position.id} value={position.id}>
+                  {position.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
       </div>
 
       {hasActiveFilters && (

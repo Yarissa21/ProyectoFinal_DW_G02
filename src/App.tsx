@@ -12,10 +12,14 @@ import { useAuthStore } from './store/authStore';
 import { homePathForRole } from './utils/roles';
 import EmployeesPage from './pages/EmployeesPage';
 import EmployeeDetailPage from './pages/EmployeeDetailPage';
+import EmployeeLinkUserPage from './pages/EmployeeLinkUserPage';
 import EmployeeCreatePage from './pages/EmployeeCreatePage';
 import EmployeeEditPage from './pages/EmployeeEditPage';
 import SystemStatusPage from './pages/SystemStatusPage';
 import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
+import MyProfilePage from './pages/MyProfilePage';
+import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
+import AcademicSummaryPage from './pages/AcademicSummaryPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -35,19 +39,26 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomeRedirect />} />
+            <Route path="/sistema" element={<SystemStatusPage />} />
+
+            <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
+              <Route path="/empleados/:id/usuario" element={<EmployeeLinkUserPage />} />
+            </Route>
 
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/sistema" element={<SystemStatusPage />} />
               <Route path="/empleados" element={<EmployeesPage />} />
               <Route path="/empleados/nuevo" element={<EmployeeCreatePage />} />
               <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
               <Route path="/empleados/:id/editar" element={<EmployeeEditPage />} />
               <Route path="/empleados/resumen" element={<EmployeesSummaryPage />} />
+              <Route path="/academicos/resumen" element={<AcademicSummaryPage />} />
             </Route>
 
             <Route element={<RoleGuard allowedRoles={['EMPLOYEE']} />}>
               <Route path="/inicio" element={<EmployeeHomePage />} />
+              <Route path="/mi-perfil" element={<MyProfilePage />} />
+              <Route path="/mis-academicos" element={<MyAcademicRecordsPage />} />
             </Route>
           </Route>
         </Route>

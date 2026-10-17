@@ -42,10 +42,14 @@ function DeleteConfirm({ employee, onConfirm, onClose, onDeleted }: DeleteConfir
       <p className="text-sm text-slate-700">
         Vas a dar de baja a <span className="font-semibold">{fullName(employee)}</span>.
       </p>
-      <p className="text-sm text-slate-700">
-        El empleado quedará retirado y se conservará su historial laboral.
-        {employee.user && ` Se desactivará su usuario vinculado (${employee.user.email}).`}
-      </p>
+      <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <p className="font-semibold">Antes de confirmar</p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          <li>Es una baja lógica: el empleado queda retirado y su registro no se elimina físicamente.</li>
+          <li>Se conserva su historial laboral y el evento de baja quedará registrado.</li>
+          {employee.user && <li>Se desactivará su usuario vinculado ({employee.user.email}).</li>}
+        </ul>
+      </div>
 
       {issue && <ServerIssueAlert issue={issue} onRetry={() => void confirm()} />}
 

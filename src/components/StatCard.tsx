@@ -7,6 +7,7 @@ interface StatCardProps {
   value: ReactNode;
   hint?: string;
   tone?: StatTone;
+  compact?: boolean;
 }
 
 const TONES: Record<StatTone, { box: string; value: string; bar: string }> = {
@@ -17,14 +18,14 @@ const TONES: Record<StatTone, { box: string; value: string; bar: string }> = {
   info: { box: 'border-violet-200 bg-violet-50', value: 'text-violet-800', bar: 'bg-violet-500' },
 };
 
-function StatCard({ label, value, hint, tone = 'brand' }: StatCardProps) {
+function StatCard({ label, value, hint, tone = 'brand', compact = false }: StatCardProps) {
   const style = TONES[tone];
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border p-4 pl-5 ${style.box}`}>
-      <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1.5 ${style.bar}`} />
-      <dt className="text-sm font-medium text-slate-700">{label}</dt>
-      <dd className={`mt-1 text-3xl font-bold ${style.value}`}>{value}</dd>
+    <div className={`relative overflow-hidden rounded-xl border ${compact ? 'p-3 pl-4' : 'p-4 pl-5'} ${style.box}`}>
+      <span aria-hidden="true" className={`absolute inset-y-0 left-0 ${compact ? 'w-1' : 'w-1.5'} ${style.bar}`} />
+      <dt className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-slate-700`}>{label}</dt>
+      <dd className={`mt-0.5 font-bold ${compact ? 'text-2xl' : 'text-3xl'} ${style.value}`}>{value}</dd>
       {hint && <p className="mt-1 text-xs text-slate-600">{hint}</p>}
     </div>
   );

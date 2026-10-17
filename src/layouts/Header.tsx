@@ -13,9 +13,12 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/inicio', label: 'Inicio', allowedRoles: ['EMPLOYEE'] },
+  { path: '/mi-perfil', label: 'Mi perfil', allowedRoles: ['EMPLOYEE'] },
+  { path: '/mis-academicos', label: 'Mis académicos', allowedRoles: ['EMPLOYEE'] },
   { path: '/empleados', label: 'Empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/empleados/resumen', label: 'Resumen empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
-  { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
+  { path: '/academicos/resumen', label: 'Resumen academicos', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
+  { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
 ];
 
 const DESKTOP_QUERY = '(min-width: 1024px)';
