@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient, useQueries } from '@tanstack/react-query';
 import {
   createBranch,
   createDepartment,
@@ -22,6 +22,7 @@ import type {
   UpdateDepartmentPayload,
   UpdateOrgStatusPayload,
   UpdatePositionPayload,
+  getDepartment,
 } from '../types/organization';
 import { catalogKeys } from './useEmployeeCatalogs';
 
@@ -45,6 +46,15 @@ export function useDepartments(params: OrgListParams) {
     queryKey: orgKeys.departments(params),
     queryFn: () => listDepartments(params),
     placeholderData: keepPreviousData,
+  });
+}
+
+export function useDepartmentsById(ids: string[]) {
+  return useQueries({
+    queries: ids.map((id) => ({
+      queryKey: [...orgKeys.all, 'department', id] as const,
+      queryFn: () => getDepartment(id),
+    })),
   });
 }
 

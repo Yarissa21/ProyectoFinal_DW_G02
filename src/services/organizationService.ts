@@ -57,6 +57,10 @@ export async function updateDepartmentStatus(id: string, payload: UpdateOrgStatu
   const res = await http.patch<ApiSuccess<Department>>(`/departments/${id}/status`, payload);
   return res.data.data;
 }
+export async function getDepartment(id: string): Promise<Department> {
+  const res = await http.get<ApiSuccess<Department>>(`/departments/${id}`);
+  return res.data.data;
+}
 
 export async function listPositions(params: OrgListParams): Promise<Paginated<Position>> {
   const res = await http.get<ApiSuccess<Paginated<Position>>>('/positions', { params: cleanParams(params) });

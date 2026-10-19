@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import DepartmentPicker from './DepartmentPicker';
 import FormActions from './FormActions';
 import Modal from '../Modal';
 import FormField from '../employees/FormField';
 import ServerIssueAlert from '../employees/ServerIssueAlert';
-import { useCreatePosition, useDepartments, useUpdatePosition } from '../../hooks/useOrganization';
+import { useCreatePosition, useUpdatePosition } from '../../hooks/useOrganization';
 import { POSITION_FORM_FIELDS, positionSchema, type PositionFormValues } from '../../schemas/organizationSchema';
 import type { CreatePositionPayload, Position, UpdatePositionPayload } from '../../types/organization';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
@@ -52,7 +53,6 @@ function toUpdatePayload(values: PositionFormValues, position: Position): Update
 function PositionDialog({ position, onClose, onSaved }: PositionDialogProps) {
   const create = useCreatePosition();
   const update = useUpdatePosition(position?.id ?? '');
-  const departments = useDepartments({ isActive: true, limit: 100 });
   const [issue, setIssue] = useState<ServerIssue | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
@@ -71,23 +71,8 @@ function PositionDialog({ position, onClose, onSaved }: PositionDialogProps) {
 
   const selected = useWatch({ control, name: 'departmentIds' });
 
-  const departmentOptions = useMemo(() => {
-    const options = (departments.data?.items ?? []).map((item) => ({
-      id: item.id,
-      label: `${item.name} · ${item.branch.name}`,
-    }));
-    for (const current of position?.departments ?? []) {
-      if (!options.some((item) => item.id === current.id)) {
-        options.unshift({ id: current.id, label: `${current.name} (inactivo)` });
-      }
-    }
-    return options;
-  }, [departments.data, position]);
-
-  const toggle = (id: string) => {
-    const next = selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id];
-    setValue('departmentIds', next, { shouldDirty: true, shouldValidate: true, shouldTouch: true });
-  };
+  const changeDepartments = (ids: string[]) =>
+    setValue('departmentIds', ids, { shouldDirty: true, shouldValidate: true, shouldTouch: true });
 
   const submit = handleSubmit(async (values) => {
     setIssue(null);
@@ -114,8 +99,6 @@ function PositionDialog({ position, onClose, onSaved }: PositionDialogProps) {
     }
   });
 
-  const departmentsError = errors.departmentIds?.message;
-
   return (
     <Modal open title={position ? 'Editar puesto' : 'Nuevo puesto'} onClose={onClose} locked={isSubmitting}>
       <form onSubmit={submit} noValidate autoComplete="off" className="space-y-4">
@@ -129,41 +112,12 @@ function PositionDialog({ position, onClose, onSaved }: PositionDialogProps) {
           {(field) => <textarea rows={2} {...field} {...register('description')} />}
         </FormField>
 
-        <fieldset aria-describedby={departmentsError ? 'pos-departments-error' : 'pos-departments-hint'}>
-          <legend className="mb-1.5 text-sm font-medium text-slate-700">
-            Departamentos donde se habilita
-            <span aria-hidden="true" className="ml-0.5 text-red-700">
-              *
-            </span>
-          </legend>
-          <p id="pos-departments-hint" className="mb-2 text-xs text-slate-600">
-            Un puesto debe estar habilitado en al menos un departamento activo.
-          </p>
-          <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-slate-300 bg-white p-2">
-            {departments.isPending && <p className="px-1 py-1 text-sm text-slate-600">Cargando departamentos…</p>}
-            {departments.isError && (
-              <p className="px-1 py-1 text-sm text-red-700">
-                No se pudieron cargar los departamentos. Cierra y vuelve a abrir el formulario.
-              </p>
-            )}
-            {departmentOptions.map((item) => (
-              <label key={item.id} className="flex items-center gap-2 rounded px-1 py-1 text-sm text-slate-800 hover:bg-slate-50">
-                <input
-                  type="checkbox"
-                  className="size-4"
-                  checked={selected.includes(item.id)}
-                  onChange={() => toggle(item.id)}
-                />
-                {item.label}
-              </label>
-            ))}
-          </div>
-          {departmentsError && (
-            <p id="pos-departments-error" role="alert" className="mt-1 text-sm text-red-700">
-              {departmentsError}
-            </p>
-          )}
-        </fieldset>
+        <DepartmentPicker
+          selected={selected}
+          initial={position?.departments ?? []}
+          error={errors.departmentIds?.message}
+          onChange={changeDepartments}
+        />
 
         {issue && <ServerIssueAlert issue={issue} onRetry={() => void submit()} />}
         {info && (
