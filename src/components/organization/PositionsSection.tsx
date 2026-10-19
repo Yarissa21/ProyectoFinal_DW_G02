@@ -18,8 +18,9 @@ const COLUMNS: OrgColumn<Position>[] = [
         <ul className="flex flex-wrap gap-1">
           {item.departments.map((department) => (
             <li key={department.id} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-800">
-              {department.name}
-            </li>
+            {department.name}
+            {!department.isActive && <span className="ml-1 text-slate-600">(inactivo)</span>}
+          </li>
           ))}
         </ul>
       ) : (

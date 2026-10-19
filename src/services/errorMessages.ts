@@ -5,6 +5,16 @@ const MESSAGE_BY_CODE: Record<string, string> = {
   EMPLOYEE_PROFILE_NOT_LINKED:
     'Tu cuenta aún no está vinculada a un perfil de empleado. Contacta al responsable.',
   EMPLOYEE_UNIQUE_CONSTRAINT: 'Ya existe un empleado con ese DPI o correo electrónico.',
+  BRANCH_HAS_ACTIVE_DEPARTMENTS:
+    'No se puede desactivar la sede porque aún tiene departamentos activos. Desactiva primero sus departamentos e inténtalo de nuevo.',
+  HEADQUARTERS_REQUIRED:
+    'La sede principal no puede perder esa designación. Marca otra sede como principal y el cambio se hará solo.',
+  HEADQUARTERS_CANNOT_BE_DEACTIVATED:
+    'No se puede desactivar la sede principal. Primero designa otra sede como principal.',
+  ACTIVE_BRANCH_REQUIRED:
+    'La sede del departamento debe estar activa. Activa primero la sede e inténtalo de nuevo.',
+  ACTIVE_DEPARTMENTS_REQUIRED:
+    'El puesto necesita al menos un departamento activo y con su sede activa. Activa primero el departamento (y su sede) e inténtalo de nuevo.',
 };
 
 const MESSAGE_BY_STATUS: Record<number, string> = {

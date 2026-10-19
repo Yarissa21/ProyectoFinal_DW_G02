@@ -59,7 +59,7 @@ function DepartmentsSection({ canManage }: { canManage: boolean }) {
         <OrgStatusDialog
           item={dialog.department}
           singular="departamento"
-          deactivateWarning="No se puede desactivar un departamento con empleados vigentes ni dejar un puesto sin ningún departamento activo. El sistema lo validará al confirmar."
+          deactivateWarning="No se puede desactivar un departamento con empleados vigentes. Sus puestos seguirán activos, pero no podrán usarse en ese departamento."
           useStatus={useUpdateDepartmentStatus}
           onClose={close}
           onSaved={() =>

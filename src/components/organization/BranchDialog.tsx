@@ -52,6 +52,7 @@ function BranchDialog({ branch, onClose, onSaved }: BranchDialogProps) {
   const update = useUpdateBranch(branch?.id ?? '');
   const [issue, setIssue] = useState<ServerIssue | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const isCurrentHeadquarters = branch?.isHeadquarters === true;
 
   const {
     register,
@@ -108,11 +109,17 @@ function BranchDialog({ branch, onClose, onSaved }: BranchDialogProps) {
           {(control) => <input type="email" {...control} {...register('email')} />}
         </FormField>
         <label className="flex items-start gap-2 text-sm text-slate-800">
-          <input type="checkbox" className="mt-0.5 size-4" {...register('isHeadquarters')} />
+          {isCurrentHeadquarters ? (
+            <input type="checkbox" className="mt-0.5 size-4" checked disabled readOnly />
+          ) : (
+            <input type="checkbox" className="mt-0.5 size-4" {...register('isHeadquarters')} />
+          )}
           <span>
             Sede principal
             <span className="block text-xs text-slate-600">
-              Solo puede haber una sede principal, y no puede perder esa designación ni desactivarse.
+              {isCurrentHeadquarters
+                ? 'Esta es la sede principal. Para cambiarla, marca otra sede como principal.'
+                : 'Solo puede haber una sede principal. Si ya existe otra, el sistema validará el cambio.'}
             </span>
           </span>
         </label>
