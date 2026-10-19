@@ -20,6 +20,7 @@ import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
 import MyProfilePage from './pages/MyProfilePage';
 import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
 import AcademicSummaryPage from './pages/AcademicSummaryPage';
+import OrganizationPage from './pages/OrganizationPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -47,6 +48,7 @@ function App() {
 
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/empresa" element={<OrganizationPage />} />
               <Route path="/empleados" element={<EmployeesPage />} />
               <Route path="/empleados/nuevo" element={<EmployeeCreatePage />} />
               <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
