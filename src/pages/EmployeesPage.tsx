@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import EmployeeCardList from '../components/employees/EmployeeCardList';
 import EmployeeFilters from '../components/employees/EmployeeFilters';
+import EmployeeSortBar from '../components/employees/EmployeeSortBar';
 import EmployeeTable from '../components/employees/EmployeeTable';
 import ErrorAlert from '../components/ErrorAlert';
 import Pagination from '../components/Pagination';
@@ -12,6 +13,7 @@ import type { EmployeeSortField } from '../types/employee';
 import { PAGE_SIZES } from '../utils/employeeLabels';
 import LoadingState from '../components/LoadingState';
 import PageHeader from '../components/PageHeader';
+
 
 const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
@@ -146,8 +148,9 @@ function EmployeesPage() {
         onClear={clearFilters}
       />
 
-      {renderContent()}
+      <EmployeeSortBar sortBy={params.sortBy} sortOrder={params.sortOrder} onSort={handleSort} />
 
+      {renderContent()}
     </section>
   );
 }
