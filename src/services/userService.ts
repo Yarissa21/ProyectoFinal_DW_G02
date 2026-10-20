@@ -1,7 +1,13 @@
 import { http } from './http';
 import type { ApiSuccess } from '../types/api';
 import type { Paginated } from '../types/pagination';
-import type { CreateUserPayload, UserAccount, UserListParams } from '../types/user';
+import type {
+  CreateUserPayload,
+  UpdateUserPayload,
+  UpdateUserStatusPayload,
+  UserAccount,
+  UserListParams,
+} from '../types/user';
 
 export async function listUsers(params: UserListParams): Promise<Paginated<UserAccount>> {
   const clean: Record<string, string | number | boolean> = {};
@@ -15,5 +21,15 @@ export async function listUsers(params: UserListParams): Promise<Paginated<UserA
 
 export async function createUser(payload: CreateUserPayload): Promise<UserAccount> {
   const res = await http.post<ApiSuccess<UserAccount>>('/users', payload);
+  return res.data.data;
+}
+
+export async function updateUser(id: string, payload: UpdateUserPayload): Promise<UserAccount> {
+  const res = await http.patch<ApiSuccess<UserAccount>>(`/users/${id}`, payload);
+  return res.data.data;
+}
+
+export async function updateUserStatus(id: string, payload: UpdateUserStatusPayload): Promise<UserAccount> {
+  const res = await http.patch<ApiSuccess<UserAccount>>(`/users/${id}/status`, payload);
   return res.data.data;
 }

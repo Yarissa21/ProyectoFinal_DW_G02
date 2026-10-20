@@ -4,8 +4,11 @@ export interface UserAccount {
   firstName: string;
   lastName: string;
   isActive: boolean;
+  lastLoginAt?: string | null;
   role: { code: string; name: string };
 }
+
+export type UserRoleCode = 'ADMIN' | 'HR_MANAGER' | 'EMPLOYEE';
 
 export interface UserListParams {
   page?: number;
@@ -19,5 +22,16 @@ export interface CreateUserPayload {
   password: string;
   firstName: string;
   lastName: string;
-  roleCode: 'ADMIN' | 'HR_MANAGER' | 'EMPLOYEE';
+  roleCode: UserRoleCode;
+}
+
+export interface UpdateUserPayload {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  roleCode?: UserRoleCode;
+}
+
+export interface UpdateUserStatusPayload {
+  isActive: boolean;
 }
