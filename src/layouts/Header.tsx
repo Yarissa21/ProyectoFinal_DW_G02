@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { logout } from '../services/authService';
 import type { RoleCode } from '../types/auth';
@@ -8,6 +8,7 @@ interface NavItem {
   path: string;
   label: string;
   allowedRoles: RoleCode[];
+  matchPaths?: string[];
 }
 
 const navItems: NavItem[] = [
@@ -15,12 +16,19 @@ const navItems: NavItem[] = [
   { path: '/inicio', label: 'Inicio', allowedRoles: ['EMPLOYEE'] },
   { path: '/mi-perfil', label: 'Mi perfil', allowedRoles: ['EMPLOYEE'] },
   { path: '/mis-academicos', label: 'Mis académicos', allowedRoles: ['EMPLOYEE'] },
+  {
+    path: '/empleados',
+    label: 'Empleados',
+    allowedRoles: ['ADMIN', 'HR_MANAGER'],
+    matchPaths: ['/academicos', '/usuarios'],
+  },
   { path: '/empresa', label: 'Empresa', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
-  { path: '/empleados', label: 'Empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
-  { path: '/empleados/resumen', label: 'Resumen empleados', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
-  { path: '/academicos/resumen', label: 'Resumen academicos', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
 ];
+
+function isCurrent(item: NavItem, pathname: string): boolean {
+  return [item.path, ...(item.matchPaths ?? [])].some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
 
 const DESKTOP_QUERY = '(min-width: 1024px)';
 
@@ -66,7 +74,7 @@ function AppLayout() {
   );
 
   const currentItem = visibleItems
-    .filter((item) => pathname === item.path || pathname.startsWith(`${item.path}/`))
+    .filter((item) => isCurrent(item, pathname))
     .sort((a, b) => b.path.length - a.path.length)[0];
 
   const closeMenu = () => {
@@ -133,18 +141,16 @@ function AppLayout() {
 
           <nav aria-label="Principal" className="hidden gap-1 lg:flex">
             {visibleItems.map((item) => (
-              <NavLink
+              <Link
                 key={item.path}
                 to={item.path}
-                end
-                className={({ isActive }) =>
-                  `rounded-md px-3 py-1.5 text-sm font-medium ${focusClass} ${
-                    isActive ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
-                  }`
-                }
+                aria-current={isCurrent(item, pathname) ? 'page' : undefined}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium ${focusClass} ${
+                  isCurrent(item, pathname) ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
+                }`}
               >
                 {item.label}
-              </NavLink>
+              </Link>
             ))}
           </nav>
 
@@ -196,19 +202,17 @@ function AppLayout() {
 
             <nav aria-label="Principal" className="mt-6 flex flex-col gap-1">
               {visibleItems.map((item) => (
-                <NavLink
+                <Link
                   key={item.path}
                   to={item.path}
-                  end
                   onClick={() => setMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `rounded-md px-3 py-2.5 text-base font-medium ${focusClass} ${
-                      isActive ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
-                    }`
-                  }
+                  aria-current={isCurrent(item, pathname) ? 'page' : undefined}
+                  className={`rounded-md px-3 py-2.5 text-base font-medium ${focusClass} ${
+                    isCurrent(item, pathname) ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
+                  }`}
                 >
                   {item.label}
-                </NavLink>
+                </Link>
               ))}
             </nav>
 
