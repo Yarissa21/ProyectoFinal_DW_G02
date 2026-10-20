@@ -21,6 +21,8 @@ interface OrgSectionProps<T extends { id: string; isActive: boolean }> {
   singular: string;
   plural: string;
   feminine?: boolean;
+  searchPlaceholder?: string;
+  canToggle?: (item: T) => boolean;
   useList: (params: OrgListParams) => UseQueryResult<Paginated<T>, Error>;
   columns: OrgColumn<T>[];
   canManage: boolean;
@@ -43,6 +45,8 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
   singular,
   plural,
   feminine = false,
+  searchPlaceholder = 'Código o nombre',
+  canToggle = () => true,
   useList,
   columns,
   canManage,
@@ -78,9 +82,11 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
       <button type="button" onClick={() => onEdit(item)} className={secondaryButtonClass}>
         Editar
       </button>
-      <button type="button" onClick={() => onToggle(item)} className={secondaryButtonClass}>
-        {item.isActive ? 'Desactivar' : 'Activar'}
-      </button>
+      {canToggle(item) && (
+        <button type="button" onClick={() => onToggle(item)} className={secondaryButtonClass}>
+          {item.isActive ? 'Desactivar' : 'Activar'}
+        </button>
+      )}
     </div>
   );
 
@@ -218,7 +224,7 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
             id={`org-search-${plural}`}
             type="search"
             value={search}
-            placeholder="Código o nombre"
+            placeholder={searchPlaceholder}
             onChange={(event) => {
               setSearch(event.target.value);
               setPage(1);
