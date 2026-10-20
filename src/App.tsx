@@ -20,6 +20,9 @@ import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
 import MyProfilePage from './pages/MyProfilePage';
 import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
 import AcademicSummaryPage from './pages/AcademicSummaryPage';
+import OrganizationPage from './pages/OrganizationPage';
+import UsersPage from './pages/UsersPage';
+import EmployeesSectionLayout from './layouts/EmployeesSectionLayout';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -47,12 +50,18 @@ function App() {
 
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/empleados" element={<EmployeesPage />} />
+              <Route path="/empresa" element={<OrganizationPage />} />
+              <Route element={<EmployeesSectionLayout />}>
+                <Route path="/empleados" element={<EmployeesPage />} />
+                <Route path="/empleados/resumen" element={<EmployeesSummaryPage />} />
+                <Route path="/academicos/resumen" element={<AcademicSummaryPage />} />
+                <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
+                  <Route path="/usuarios" element={<UsersPage />} />
+                </Route>
+              </Route>
               <Route path="/empleados/nuevo" element={<EmployeeCreatePage />} />
               <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
               <Route path="/empleados/:id/editar" element={<EmployeeEditPage />} />
-              <Route path="/empleados/resumen" element={<EmployeesSummaryPage />} />
-              <Route path="/academicos/resumen" element={<AcademicSummaryPage />} />
             </Route>
 
             <Route element={<RoleGuard allowedRoles={['EMPLOYEE']} />}>

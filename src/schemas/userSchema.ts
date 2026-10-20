@@ -9,8 +9,13 @@ export const userSchema = z.object({
   password: z
     .string()
     .min(1, 'Ingresa la contraseña inicial')
-    .min(10, 'La contraseña debe tener al menos 10 caracteres'),
+    .min(8, 'La contraseña debe tener al menos 8 caracteres'),
   roleCode: z.enum(['ADMIN', 'HR_MANAGER', 'EMPLOYEE']),
 });
 
 export type UserFormValues = z.infer<typeof userSchema>;
+
+export const USER_EDIT_FIELDS = ['email', 'firstName', 'lastName', 'roleCode'] as const;
+
+export const userEditSchema = userSchema.omit({ password: true });
+export type UserEditFormValues = z.infer<typeof userEditSchema>;
