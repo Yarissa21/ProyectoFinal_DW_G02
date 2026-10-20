@@ -19,7 +19,7 @@ function cleanParams(params: OrgListParams): Record<string, string | number | bo
   const clean: Record<string, string | number | boolean> = {};
   for (const [key, value] of Object.entries(params)) {
     if (value === undefined || value === null || value === '') continue;
-    clean[key] = value as string | number | boolean;
+    clean[key] = value === false ? '' : (value as string | number | boolean);
   }
   return clean;
 }

@@ -14,7 +14,7 @@ export async function listUsers(params: UserListParams): Promise<Paginated<UserA
   if (params.page) clean.page = params.page;
   if (params.limit) clean.limit = params.limit;
   if (params.search) clean.search = params.search;
-  if (params.isActive !== undefined) clean.isActive = params.isActive;
+  if (params.isActive !== undefined) clean.isActive = params.isActive === false ? '' : params.isActive;
   const res = await http.get<ApiSuccess<Paginated<UserAccount>>>('/users', { params: clean });
   return res.data.data;
 }
