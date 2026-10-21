@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   },
   { path: '/empresa', label: 'Empresa', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
+  { path: '/tipos-documentos', label: 'Tipos documentos', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
 ];
 
 function isCurrent(item: NavItem, pathname: string): boolean {

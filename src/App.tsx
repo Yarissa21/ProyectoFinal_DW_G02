@@ -24,6 +24,7 @@ import AcademicSummaryPage from './pages/AcademicSummaryPage';
 import OrganizationPage from './pages/OrganizationPage';
 import UsersPage from './pages/UsersPage';
 import EmployeesSectionLayout from './layouts/EmployeesSectionLayout';
+import DocumentTypesPage from './pages/DocumentTypesPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -52,6 +53,7 @@ function App() {
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/empresa" element={<OrganizationPage />} />
+              <Route path="/tipos-documentos" element={<DocumentTypesPage />} />
               <Route element={<EmployeesSectionLayout />}>
                 <Route path="/empleados" element={<EmployeesPage />} />
                 <Route path="/empleados/resumen" element={<EmployeesSummaryPage />} />

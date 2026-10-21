@@ -2,9 +2,11 @@ import { http } from './http';
 import type { ApiSuccess } from '../types/api';
 import type { Paginated } from '../types/pagination';
 import type {
+  CreateDocumentTypePayload,
   DocumentType,
   EmployeeDocument,
   EmployeeDocumentListParams,
+  UpdateDocumentTypePayload,
   UploadDocumentPayload,
 } from '../types/document';
 
@@ -17,8 +19,25 @@ function cleanParams<T extends object>(params: T): Record<string, string | numbe
   return clean;
 }
 
-export async function listDocumentTypes(): Promise<DocumentType[]> {
-  const res = await http.get<ApiSuccess<DocumentType[]>>('/document-types');
+export async function listDocumentTypes(includeInactive = false): Promise<DocumentType[]> {
+  const res = await http.get<ApiSuccess<DocumentType[]>>('/document-types', {
+    params: includeInactive ? { includeInactive: true } : undefined,
+  });
+  return res.data.data;
+}
+
+export async function createDocumentType(payload: CreateDocumentTypePayload): Promise<DocumentType> {
+  const res = await http.post<ApiSuccess<DocumentType>>('/document-types', payload);
+  return res.data.data;
+}
+
+export async function updateDocumentType(id: string, payload: UpdateDocumentTypePayload): Promise<DocumentType> {
+  const res = await http.patch<ApiSuccess<DocumentType>>(`/document-types/${id}`, payload);
+  return res.data.data;
+}
+
+export async function updateDocumentTypeStatus(id: string, isActive: boolean): Promise<DocumentType> {
+  const res = await http.patch<ApiSuccess<DocumentType>>(`/document-types/${id}/status`, { isActive });
   return res.data.data;
 }
 

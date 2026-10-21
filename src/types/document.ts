@@ -47,3 +47,16 @@ export interface MyDocumentListParams {
   limit?: number;
   search?: string;
 }
+export interface CreateDocumentTypePayload {
+  code: string;
+  name: string;
+  description?: string;
+  isRequired?: boolean;
+  isActive?: boolean;
+}
+
+export interface UpdateDocumentTypePayload {
+  name?: string;
+  description?: string;
+  isRequired?: boolean;
+}
