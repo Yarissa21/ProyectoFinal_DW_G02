@@ -6,6 +6,7 @@ import Pagination from '../Pagination';
 import AcademicDeleteDialog from './AcademicDeleteDialog';
 import AcademicRecordDialog from './AcademicRecordDialog';
 import { useAcademicRecords } from '../../hooks/useAcademicRecords';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { describeError } from '../../services/errorMessages';
 import type { AcademicRecord, AcademicRecordType } from '../../types/academic';
 import { ACADEMIC_TYPE_LABELS, ACADEMIC_TYPE_VALUES } from '../../utils/academicLabels';
@@ -152,20 +153,20 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(DEFAULT_PAGE_SIZE);
   const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
   const [type, setType] = useState<AcademicRecordType | ''>('');
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [selected, setSelected] = useState<AcademicRecord | null>(null);
   const [notice, setNotice] = useTimedNotice();
 
+  const debouncedSearch = useDebouncedValue(searchInput.trim());
   const query = useAcademicRecords(employeeId, {
     page,
     limit,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     type: type || undefined,
   });
 
-  const hasFilters = search !== '' || type !== '';
+  const hasFilters = searchInput.trim() !== '' || type !== '';
 
   const closeDialog = () => setDialog(null);
 
@@ -190,17 +191,9 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
     setDialog('delete');
   };
 
-  const applySearch = (event: FormEvent) => {
-    event.preventDefault();
-    setNotice(null);
-    setSearch(searchInput.trim());
-    setPage(1);
-  };
-
   const clearFilters = () => {
     setNotice(null);
     setSearchInput('');
-    setSearch('');
     setType('');
     setPage(1);
   };
@@ -296,7 +289,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
       <form
         role="search"
         aria-label="Buscar registros académicos"
-        onSubmit={applySearch}
+        onSubmit={(event: FormEvent) => event.preventDefault()}
         className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto] sm:items-end"
       >
         <div>
@@ -307,7 +300,11 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             id="acad-search"
             type="search"
             value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
+            onChange={(event) => {
+              setNotice(null);
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
             placeholder="Título, institución o código"
             className={controlClass}
           />
@@ -335,12 +332,6 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
           </select>
         </div>
         <div className="flex gap-2">
-          <button
-            type="submit"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-          >
-            Buscar
-          </button>
           {hasFilters && (
             <button
               type="button"

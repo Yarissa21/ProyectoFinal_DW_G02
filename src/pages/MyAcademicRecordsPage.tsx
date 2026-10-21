@@ -6,6 +6,7 @@ import LoadingState from '../components/LoadingState';
 import PageHeader from '../components/PageHeader';
 import Pagination from '../components/Pagination';
 import NotLinkedNotice, { NOT_LINKED_CODE } from '../components/selfService/NotLinkedNotice';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { useMyAcademicRecords } from '../hooks/useSelfService';
 import { describeError } from '../services/errorMessages';
 import type { AcademicRecord, AcademicRecordType } from '../types/academic';
@@ -110,27 +111,20 @@ function MyAcademicRecordsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(DEFAULT_PAGE_SIZE);
   const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
   const [type, setType] = useState<AcademicRecordType | ''>('');
 
+  const debouncedSearch = useDebouncedValue(searchInput.trim());
   const query = useMyAcademicRecords({
     page,
     limit,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     type: type || undefined,
   });
 
-  const hasFilters = search !== '' || type !== '';
-
-  const applySearch = (event: FormEvent) => {
-    event.preventDefault();
-    setSearch(searchInput.trim());
-    setPage(1);
-  };
+  const hasFilters = searchInput.trim() !== '' || type !== '';
 
   const clearFilters = () => {
     setSearchInput('');
-    setSearch('');
     setType('');
     setPage(1);
   };
@@ -200,7 +194,7 @@ function MyAcademicRecordsPage() {
       <form
         role="search"
         aria-label="Buscar en mis registros académicos"
-        onSubmit={applySearch}
+        onSubmit={(event: FormEvent) => event.preventDefault()}
         className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto] sm:items-end"
       >
         <div>
@@ -211,7 +205,10 @@ function MyAcademicRecordsPage() {
             id="my-acad-search"
             type="search"
             value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
             placeholder="Título, institución o código"
             className={controlClass}
           />
@@ -238,9 +235,6 @@ function MyAcademicRecordsPage() {
           </select>
         </div>
         <div className="flex gap-2">
-          <button type="submit" className={secondaryButtonClass}>
-            Buscar
-          </button>
           {hasFilters && (
             <button type="button" onClick={clearFilters} className={textButtonClass}>
               Limpiar

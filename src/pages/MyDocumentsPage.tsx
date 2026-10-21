@@ -7,6 +7,7 @@ import PageHeader from '../components/PageHeader';
 import Pagination from '../components/Pagination';
 import NotLinkedNotice, { NOT_LINKED_CODE } from '../components/selfService/NotLinkedNotice';
 import { useMyDocuments } from '../hooks/useMyDocuments';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { describeError, type ErrorDescription } from '../services/errorMessages';
 import { fetchMyDocumentFile } from '../services/myDocumentService';
 import type { MyDocument } from '../types/document';
@@ -139,23 +140,16 @@ function MyDocumentsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(DEFAULT_PAGE_SIZE);
   const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
   const [fileError, setFileError] = useState<ErrorDescription | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const query = useMyDocuments({ page, limit, search: search || undefined });
+  const debouncedSearch = useDebouncedValue(searchInput.trim());
+  const query = useMyDocuments({ page, limit, search: debouncedSearch || undefined });
 
-  const hasFilters = search !== '';
-
-  const applySearch = (event: FormEvent) => {
-    event.preventDefault();
-    setSearch(searchInput.trim());
-    setPage(1);
-  };
+  const hasFilters = searchInput.trim() !== '';
 
   const clearFilters = () => {
     setSearchInput('');
-    setSearch('');
     setPage(1);
   };
 
@@ -258,7 +252,7 @@ function MyDocumentsPage() {
       <form
         role="search"
         aria-label="Buscar en mis documentos"
-        onSubmit={applySearch}
+        onSubmit={(event: FormEvent) => event.preventDefault()}
         className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_auto] sm:items-end"
       >
         <div>
@@ -269,15 +263,15 @@ function MyDocumentsPage() {
             id="my-doc-search"
             type="search"
             value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
             placeholder="Nombre del archivo o tipo"
             className={controlClass}
           />
         </div>
         <div className="flex gap-2">
-          <button type="submit" className={secondaryButtonClass}>
-            Buscar
-          </button>
           {hasFilters && (
             <button type="button" onClick={clearFilters} className={textButtonClass}>
               Limpiar
