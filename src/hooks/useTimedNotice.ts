@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 export const NOTICE_DURATION_MS = 10000;
 
-export function useTimedNotice(initial: string | null = null) {
-  const [notice, setNotice] = useState<string | null>(initial);
+export function useTimedNotice<T = string>(initial: T | null = null) {
+  const [notice, setNotice] = useState<T | null>(initial);
 
   useEffect(() => {
     if (!notice) return;

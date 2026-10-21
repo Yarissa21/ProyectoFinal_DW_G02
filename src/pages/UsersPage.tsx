@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTimedNotice } from '../hooks/useTimedNotice';
 import CreateUserDialog from '../components/employees/CreateUserDialog';
 import OrgNotice from '../components/organization/OrgNotice';
 import OrgSection, { type OrgColumn } from '../components/organization/OrgSection';
@@ -20,7 +21,7 @@ function fullName(user: UserAccount): string {
 function UsersPage() {
   const currentUserId = useAuthStore((state) => state.user?.id);
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useTimedNotice();
 
   const close = () => setDialog(null);
   const saved = (message: string) => {
