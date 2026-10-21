@@ -47,7 +47,7 @@ function CoverageBar({ report }: { report: AcademicSummaryReport }) {
       <SectionTitle id="coverage-title">Cobertura académica</SectionTitle>
       <p className="mt-2 text-sm text-slate-700">
         {formatCount(report.employeesWithRecords)} de {formatCount(report.totalEmployees)} empleados tienen al
-        menos un antecedente registrado ({formatPercentage(report.coveragePercentage)}).
+        menos un registro académico ({formatPercentage(report.coveragePercentage)}).
       </p>
       <div
         role="progressbar"
@@ -142,7 +142,7 @@ function DepartmentCoverage({ report }: { report: AcademicSummaryReport }) {
                     Empleados
                   </th>
                   <th scope="col" className={numThClass}>
-                    Con antecedentes
+                    Con registros
                   </th>
                   <th scope="col" className={numThClass}>
                     Cobertura
@@ -180,7 +180,7 @@ function DepartmentCoverage({ report }: { report: AcademicSummaryReport }) {
                     <dd className="text-slate-900">{formatCount(row.employeeCount)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-600">Con antecedentes</dt>
+                    <dt className="text-xs text-slate-600">Con registros</dt>
                     <dd className="text-slate-900">{formatCount(row.employeesWithRecords)}</dd>
                   </div>
                   <div>
@@ -226,8 +226,8 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
     <div className="space-y-6">
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard tone="brand" label="Empleados incluidos" value={formatCount(report.totalEmployees)} />
-        <StatCard tone="success" label="Con antecedentes" value={formatCount(report.employeesWithRecords)} />
-        <StatCard tone="warning" label="Sin antecedentes" value={formatCount(report.employeesWithoutRecords)} />
+        <StatCard tone="success" label="Con registros" value={formatCount(report.employeesWithRecords)} />
+        <StatCard tone="warning" label="Sin registros" value={formatCount(report.employeesWithoutRecords)} />
         <StatCard tone="info" label="Registros académicos" value={formatCount(report.totalAcademicRecords)} />
         <StatCard
           tone="success"

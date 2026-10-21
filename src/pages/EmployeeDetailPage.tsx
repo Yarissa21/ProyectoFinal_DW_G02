@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useTimedNotice } from '../hooks/useTimedNotice';
 import { EmploymentStatusBadge } from '../components/EmployeeBadges';
 import AcademicRecordsSection from '../components/academic/AcademicRecordsSection';
+import DocumentsSection from '../components/documents/DocumentsSection';
 import BackLink from '../components/employees/BackLink';
 import DetailTabs, { type DetailTab } from '../components/employees/DetailTabs';
 import EmployeeDeleteDialog from '../components/employees/EmployeeDeleteDialog';
@@ -16,12 +18,13 @@ import { useAuthStore } from '../store/authStore';
 import { fullName } from '../utils/format';
 
 type OpenDialog = 'status' | 'delete' | null;
-type DetailSection = 'info' | 'academic' | 'history';
+type DetailSection = 'info' | 'academic' | 'documents' | 'history';
 
 const TAB_PREFIX = 'employee-detail';
 const TABS: DetailTab[] = [
   { id: 'info', label: 'Información' },
-  { id: 'academic', label: 'Antecedentes' },
+  { id: 'academic', label: 'Académicos' },
+  { id: 'documents', label: 'Documentos' },
   { id: 'history', label: 'Historial' },
 ];
 
@@ -38,9 +41,7 @@ function EmployeeDetailPage() {
   const navigate = useNavigate();
   const role = useAuthStore((state) => state.user?.role.code);
   const query = useEmployee(id);
-  const [notice, setNotice] = useState<string | undefined>(
-    () => (location.state as { notice?: string } | null)?.notice,
-  );
+  const [notice, setNotice] = useTimedNotice((location.state as { notice?: string } | null)?.notice ?? null);
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [section, setSection] = useState<DetailSection>('info');
 
@@ -64,6 +65,11 @@ function EmployeeDetailPage() {
   const employee = query.data;
   const isAdmin = role === 'ADMIN';
   const canDelete = isAdmin && employee.status !== 'RETIRED';
+
+  const openDialog = (next: OpenDialog) => {
+    setNotice(null);
+    setDialog(next);
+  };
 
   return (
     <section aria-labelledby="employee-title" className="space-y-6">
@@ -94,11 +100,11 @@ function EmployeeDetailPage() {
               {employee.user ? 'Cambiar usuario' : 'Vincular usuario'}
             </Link>
           )}
-          <button type="button" onClick={() => setDialog('status')} className={secondaryButtonClass}>
+          <button type="button" onClick={() => openDialog('status')} className={secondaryButtonClass}>
             Cambiar estado
           </button>
           {canDelete && (
-            <button type="button" onClick={() => setDialog('delete')} className={dangerButtonClass}>
+            <button type="button" onClick={() => openDialog('delete')} className={dangerButtonClass}>
               Dar de baja
             </button>
           )}
@@ -111,12 +117,18 @@ function EmployeeDetailPage() {
           label="Secciones del empleado"
           tabs={TABS}
           active={section}
-          onChange={(id) => setSection(id as DetailSection)}
+          onChange={(id) => {
+            setNotice(null);
+            setSection(id as DetailSection);
+          }}
         />
         <div role="tabpanel" id={`${TAB_PREFIX}-panel-${section}`} aria-labelledby={`${TAB_PREFIX}-tab-${section}`}>
           {section === 'info' && <EmployeeDetailCard employee={employee} />}
           {section === 'academic' && (
             <AcademicRecordsSection employeeId={employee.id} employeeName={fullName(employee)} />
+          )}
+          {section === 'documents' && (
+            <DocumentsSection employeeId={employee.id} employeeName={fullName(employee)} />
           )}
           {section === 'history' && <EmploymentHistory employeeId={employee.id} />}
         </div>

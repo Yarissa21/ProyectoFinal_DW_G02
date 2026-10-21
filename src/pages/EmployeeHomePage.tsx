@@ -45,7 +45,7 @@ function HomeContent({ profile }: { profile: SelfServiceProfile }) {
           </p>
         </Link>
         <Link to="/mis-academicos" className={cardLinkClass}>
-          <h2 className="font-semibold text-slate-900">Mis antecedentes académicos</h2>
+          <h2 className="font-semibold text-slate-900">Mis registros académicos</h2>
           <p className="mt-1 text-sm text-slate-600">Revisa los estudios registrados en tu expediente.</p>
         </Link>
       </div>

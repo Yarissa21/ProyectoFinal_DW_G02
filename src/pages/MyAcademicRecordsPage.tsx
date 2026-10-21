@@ -33,7 +33,7 @@ function RecordsTable({ items }: { items: AcademicRecord[] }) {
   return (
     <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white lg:block">
       <table className="w-full min-w-[40rem] text-sm">
-        <caption className="sr-only">Mis antecedentes académicos</caption>
+        <caption className="sr-only">Mis registros académicos</caption>
         <thead className="border-b border-slate-200 bg-slate-50">
           <tr>
             <th scope="col" className={thClass}>
@@ -73,7 +73,7 @@ function RecordsTable({ items }: { items: AcademicRecord[] }) {
 
 function RecordsCards({ items }: { items: AcademicRecord[] }) {
   return (
-    <ul aria-label="Mis antecedentes académicos" className="space-y-3 lg:hidden">
+    <ul aria-label="Mis registros académicos" className="space-y-3 lg:hidden">
       {items.map((record) => (
         <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -136,7 +136,7 @@ function MyAcademicRecordsPage() {
   };
 
   const renderContent = () => {
-    if (query.isPending) return <LoadingState label="Cargando tus antecedentes académicos…" />;
+    if (query.isPending) return <LoadingState label="Cargando tus registros académicos…" />;
 
     if (query.isError) {
       const error = describeError(query.error);
@@ -151,7 +151,7 @@ function MyAcademicRecordsPage() {
     if (items.length === 0) {
       return hasFilters ? (
         <EmptyState
-          title="No hay antecedentes que coincidan con la búsqueda."
+          title="No hay registros que coincidan con la búsqueda."
           action={
             <button type="button" onClick={clearFilters} className={textButtonClass}>
               Quitar filtros
@@ -160,7 +160,7 @@ function MyAcademicRecordsPage() {
         />
       ) : (
         <EmptyState
-          title="Todavía no tienes antecedentes académicos registrados."
+          title="Todavía no tienes registros académicos."
           description="Recursos Humanos registra los estudios en tu expediente. Si falta alguno, solicítalo con ellos."
         />
       );
@@ -188,7 +188,7 @@ function MyAcademicRecordsPage() {
     <section aria-labelledby="my-academic-title" className="space-y-6">
       <PageHeader
         id="my-academic-title"
-        title="Mis antecedentes académicos"
+        title="Mis registros académicos"
         description="Títulos, certificaciones y cursos registrados en tu expediente."
         actions={
           <Link to="/inicio" className={secondaryButtonClass}>
@@ -199,7 +199,7 @@ function MyAcademicRecordsPage() {
 
       <form
         role="search"
-        aria-label="Buscar en mis antecedentes académicos"
+        aria-label="Buscar en mis registros académicos"
         onSubmit={applySearch}
         className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto] sm:items-end"
       >
