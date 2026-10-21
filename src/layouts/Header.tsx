@@ -16,6 +16,7 @@ const navItems: NavItem[] = [
   { path: '/inicio', label: 'Inicio', allowedRoles: ['EMPLOYEE'] },
   { path: '/mi-perfil', label: 'Mi perfil', allowedRoles: ['EMPLOYEE'] },
   { path: '/mis-academicos', label: 'Mis académicos', allowedRoles: ['EMPLOYEE'] },
+  { path: '/mis-documentos', label: 'Mis documentos', allowedRoles: ['EMPLOYEE'] },
   {
     path: '/empleados',
     label: 'Empleados',

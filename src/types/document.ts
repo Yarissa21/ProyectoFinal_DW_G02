@@ -31,3 +31,19 @@ export interface UploadDocumentPayload {
   file: File;
   expiresAt?: string;
 }
+
+export interface MyDocument {
+  id: string;
+  documentType: DocumentType;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  expiresAt?: string | null;
+}
+
+export interface MyDocumentListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}

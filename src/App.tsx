@@ -19,6 +19,7 @@ import SystemStatusPage from './pages/SystemStatusPage';
 import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
 import MyProfilePage from './pages/MyProfilePage';
 import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
+import MyDocumentsPage from './pages/MyDocumentsPage';
 import AcademicSummaryPage from './pages/AcademicSummaryPage';
 import OrganizationPage from './pages/OrganizationPage';
 import UsersPage from './pages/UsersPage';
@@ -68,6 +69,7 @@ function App() {
               <Route path="/inicio" element={<EmployeeHomePage />} />
               <Route path="/mi-perfil" element={<MyProfilePage />} />
               <Route path="/mis-academicos" element={<MyAcademicRecordsPage />} />
+              <Route path="/mis-documentos" element={<MyDocumentsPage />} />
             </Route>
           </Route>
         </Route>
