@@ -224,7 +224,7 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
 
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <StatCard tone="brand" label="Empleados incluidos" value={formatCount(report.totalEmployees)} />
         <StatCard tone="success" label="Con registros" value={formatCount(report.employeesWithRecords)} />
         <StatCard tone="warning" label="Sin registros" value={formatCount(report.employeesWithoutRecords)} />

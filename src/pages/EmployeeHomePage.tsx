@@ -13,7 +13,7 @@ const cardLinkClass =
 function HomeContent({ profile }: { profile: SelfServiceProfile }) {
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           tone="success"
           label="Estado laboral"
@@ -27,13 +27,15 @@ function HomeContent({ profile }: { profile: SelfServiceProfile }) {
         <StatCard
           tone="brand"
           label="Departamento"
-          value={<span className="text-xl break-words">{profile.department.name}</span>}
+          value={<span className="text-lg break-words">{profile.department.name}</span>}
           hint={profile.position.name}
+          className="col-span-2 lg:col-span-1"
         />
         <StatCard
           tone="warning"
           label="Fecha de ingreso"
-          value={<span className="text-xl">{formatDate(profile.hireDate)}</span>}
+          value={<span className="text-lg">{formatDate(profile.hireDate)}</span>}
+          className="col-span-2 lg:col-span-1"
         />
       </dl>
 
