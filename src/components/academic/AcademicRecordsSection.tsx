@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useTimedNotice } from '../../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import ErrorAlert from '../ErrorAlert';
 import LoadingState from '../LoadingState';
 import Pagination from '../Pagination';
@@ -156,7 +156,6 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
   const [type, setType] = useState<AcademicRecordType | ''>('');
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [selected, setSelected] = useState<AcademicRecord | null>(null);
-  const [notice, setNotice] = useTimedNotice();
 
   const debouncedSearch = useDebouncedValue(searchInput.trim());
   const query = useAcademicRecords(employeeId, {
@@ -172,27 +171,23 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
 
   const handleSaved = (message: string) => {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   };
 
   const openCreate = () => {
-    setNotice(null);
     setSelected(null);
     setDialog('create');
   };
   const openEdit = (record: AcademicRecord) => {
-    setNotice(null);
     setSelected(record);
     setDialog('edit');
   };
   const openDelete = (record: AcademicRecord) => {
-    setNotice(null);
     setSelected(record);
     setDialog('delete');
   };
 
   const clearFilters = () => {
-    setNotice(null);
     setSearchInput('');
     setType('');
     setPage(1);
@@ -246,11 +241,9 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
           pageSizes={PAGE_SIZES}
           disabled={query.isFetching}
           onPageChange={(value) => {
-            setNotice(null);
             setPage(value);
           }}
           onLimitChange={(value) => {
-            setNotice(null);
             setLimit(value);
             setPage(1);
           }}
@@ -280,12 +273,6 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
         </button>
       </div>
 
-      {notice && (
-        <p role="status" className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900">
-          {notice}
-        </p>
-      )}
-
       <form
         role="search"
         aria-label="Buscar registros académicos"
@@ -301,7 +288,6 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             type="search"
             value={searchInput}
             onChange={(event) => {
-              setNotice(null);
               setSearchInput(event.target.value);
               setPage(1);
             }}
@@ -317,7 +303,6 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             id="acad-filter-type"
             value={type}
             onChange={(event) => {
-              setNotice(null);
               setType(event.target.value as AcademicRecordType | '');
               setPage(1);
             }}
@@ -373,7 +358,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             onClose={closeDialog}
             onDeleted={() => {
               setDialog(null);
-              setNotice('Registro académico eliminado correctamente.');
+              toast.success('Registro académico eliminado correctamente.');
               if (currentItems.length === 1 && page > 1) setPage(page - 1);
             }}
           />

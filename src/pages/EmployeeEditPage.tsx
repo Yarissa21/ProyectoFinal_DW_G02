@@ -6,6 +6,7 @@ import LoadingState from '../components/LoadingState';
 import { useEmployeeCatalogs } from '../hooks/useEmployeeCatalogs';
 import { useEmployee, useUpdateEmployee } from '../hooks/useEmployees';
 import { describeError } from '../services/errorMessages';
+import toast from 'react-hot-toast';
 import { fullName } from '../utils/format';
 
 function EmployeeEditPage() {
@@ -53,7 +54,8 @@ function EmployeeEditPage() {
         cancelTo={`/empleados/${id}`}
         onSubmit={async (payload) => {
           await updateEmployee.mutateAsync(payload);
-          navigate(`/empleados/${id}`, { state: { notice: 'Cambios guardados correctamente.' } });
+          toast.success('Cambios guardados correctamente.');
+          navigate(`/empleados/${id}`);
         }}
       />
     </section>

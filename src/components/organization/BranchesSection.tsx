@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useTimedNotice } from '../../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import BranchDialog from './BranchDialog';
-import OrgNotice from './OrgNotice';
 import OrgSection, { type OrgColumn } from './OrgSection';
 import OrgStatusDialog from './OrgStatusDialog';
 import { useBranches, useUpdateBranchStatus } from '../../hooks/useOrganization';
@@ -42,17 +41,15 @@ const COLUMNS: OrgColumn<Branch>[] = [
 
 function BranchesSection({ canManage }: { canManage: boolean }) {
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useTimedNotice();
 
   const close = () => setDialog(null);
   const saved = (message: string) => {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   };
 
   return (
     <div className="space-y-4">
-      <OrgNotice message={notice} />
       <OrgSection
         singular="sede"
         plural="sedes"

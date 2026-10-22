@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useTimedNotice } from '../../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import ErrorAlert from '../ErrorAlert';
 import LoadingState from '../LoadingState';
 import Pagination from '../Pagination';
 import DocumentDeleteDialog from './DocumentDeleteDialog';
 import DocumentUploadDialog from './DocumentUploadDialog';
 import { useDocumentTypes, useEmployeeDocuments } from '../../hooks/useDocuments';
-import { describeError, type ErrorDescription } from '../../services/errorMessages';
+import { describeError, toastOrReport, type ErrorDescription } from '../../services/errorMessages';
 import { fetchEmployeeDocumentFile } from '../../services/documentService';
 import type { EmployeeDocument } from '../../types/document';
 import { canPreviewDocument, formatFileSize, openBlobInTab, saveBlob } from '../../utils/documentFiles';
@@ -166,7 +166,6 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
   const [documentTypeId, setDocumentTypeId] = useState('');
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [selected, setSelected] = useState<EmployeeDocument | null>(null);
-  const [notice, setNotice] = useTimedNotice();
   const [fileError, setFileError] = useState<ErrorDescription | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -180,32 +179,28 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
   const hasFilters = documentTypeId !== '';
 
   const openUpload = () => {
-    setNotice(null);
     setDialog('upload');
   };
 
   const openDelete = (document: EmployeeDocument) => {
-    setNotice(null);
     setSelected(document);
     setDialog('delete');
   };
 
   const handleDownload = async (document: EmployeeDocument) => {
-    setNotice(null);
     setFileError(null);
     setBusyId(document.id);
     try {
       const blob = await fetchEmployeeDocumentFile(document.id);
       saveBlob(blob, document.originalName);
     } catch (error) {
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
   };
 
   const handleView = async (document: EmployeeDocument) => {
-    setNotice(null);
     setFileError(null);
     setBusyId(document.id);
     const tab = window.open('', '_blank');
@@ -215,7 +210,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
       openBlobInTab(typed, tab, document.originalName);
     } catch (error) {
       tab?.close();
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
@@ -246,7 +241,6 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
               <button
                 type="button"
                 onClick={() => {
-                  setNotice(null);
                   setDocumentTypeId('');
                   setPage(1);
                 }}
@@ -280,11 +274,9 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           pageSizes={PAGE_SIZES}
           disabled={query.isFetching}
           onPageChange={(value) => {
-            setNotice(null);
             setPage(value);
           }}
           onLimitChange={(value) => {
-            setNotice(null);
             setLimit(value);
             setPage(1);
           }}
@@ -314,12 +306,6 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
         </button>
       </div>
 
-      {notice && (
-        <p role="status" className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900">
-          {notice}
-        </p>
-      )}
-
       {fileError && <ErrorAlert error={fileError} />}
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 sm:max-w-sm">
@@ -331,7 +317,6 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           value={documentTypeId}
           disabled={types.isPending}
           onChange={(event) => {
-            setNotice(null);
             setDocumentTypeId(event.target.value);
             setPage(1);
           }}
@@ -354,7 +339,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
         onClose={() => setDialog(null)}
         onUploaded={(message) => {
           setDialog(null);
-          setNotice(message);
+          toast.success(message);
         }}
       />
 
@@ -367,7 +352,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           onClose={() => setDialog(null)}
           onDeleted={() => {
             setDialog(null);
-            setNotice('Documento eliminado correctamente.');
+            toast.success('Documento eliminado correctamente.');
             if (currentCount === 1 && page > 1) setPage(page - 1);
           }}
         />

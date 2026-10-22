@@ -8,7 +8,7 @@ import Pagination from '../components/Pagination';
 import NotLinkedNotice, { NOT_LINKED_CODE } from '../components/selfService/NotLinkedNotice';
 import { useMyDocuments } from '../hooks/useMyDocuments';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
-import { describeError, type ErrorDescription } from '../services/errorMessages';
+import { describeError, toastOrReport, type ErrorDescription } from '../services/errorMessages';
 import { fetchMyDocumentFile } from '../services/myDocumentService';
 import type { MyDocument } from '../types/document';
 import { canPreviewDocument, formatFileSize, openBlobInTab, saveBlob } from '../utils/documentFiles';
@@ -160,7 +160,7 @@ function MyDocumentsPage() {
       const blob = await fetchMyDocumentFile(document.id);
       saveBlob(blob, document.originalName);
     } catch (error) {
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
@@ -175,7 +175,7 @@ function MyDocumentsPage() {
       openBlobInTab(new Blob([blob], { type: document.mimeType }), tab, document.originalName);
     } catch (error) {
       tab?.close();
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }

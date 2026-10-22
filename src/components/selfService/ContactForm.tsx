@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTimedNotice } from '../../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormField from '../employees/FormField';
@@ -15,15 +15,10 @@ import {
 import type { SelfServiceProfile, UpdateSelfServiceContactPayload } from '../../types/selfService';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
 
-interface Notice {
-  tone: 'success' | 'info';
-  text: string;
-}
 
 function ContactForm({ profile }: { profile: SelfServiceProfile }) {
   const mutation = useUpdateMyContact();
   const [issue, setIssue] = useState<ServerIssue | null>(null);
-  const [notice, setNotice] = useTimedNotice<Notice>();
 
   const {
     register,
@@ -39,21 +34,20 @@ function ContactForm({ profile }: { profile: SelfServiceProfile }) {
 
   const submit = handleSubmit(async (values) => {
     setIssue(null);
-    setNotice(null);
 
     const payload: UpdateSelfServiceContactPayload = {};
     if (values.address !== profile.address) payload.address = values.address;
     if (values.phone !== (profile.phone ?? '')) payload.phone = values.phone;
 
     if (Object.keys(payload).length === 0) {
-      setNotice({ tone: 'info', text: 'No hay cambios para guardar.' });
+      toast('No hay cambios para guardar.');
       return;
     }
 
     try {
       const updated = await mutation.mutateAsync(payload);
       reset({ address: updated.address, phone: updated.phone ?? '' });
-      setNotice({ tone: 'success', text: 'Tus datos de contacto se actualizaron correctamente.' });
+      toast.success('Tus datos de contacto se actualizaron correctamente.');
     } catch (error) {
       setIssue(
         resolveServerIssue(error, CONTACT_FORM_FIELDS, (field, message, focus) =>
@@ -95,18 +89,6 @@ function ContactForm({ profile }: { profile: SelfServiceProfile }) {
 
         {issue && <ServerIssueAlert issue={issue} onRetry={() => void submit()} />}
 
-        {notice && (
-          <p
-            role="status"
-            className={
-              notice.tone === 'success'
-                ? 'rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900'
-                : 'rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-800'
-            }
-          >
-            {notice.text}
-          </p>
-        )}
 
         <div className="flex justify-end">
           <button

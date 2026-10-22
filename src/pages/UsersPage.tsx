@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useTimedNotice } from '../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import CreateUserDialog from '../components/employees/CreateUserDialog';
-import OrgNotice from '../components/organization/OrgNotice';
 import OrgSection, { type OrgColumn } from '../components/organization/OrgSection';
 import OrgStatusDialog from '../components/organization/OrgStatusDialog';
 import PageHeader from '../components/PageHeader';
@@ -21,12 +20,11 @@ function fullName(user: UserAccount): string {
 function UsersPage() {
   const currentUserId = useAuthStore((state) => state.user?.id);
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useTimedNotice();
 
   const close = () => setDialog(null);
   const saved = (message: string) => {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   };
 
   const columns: OrgColumn<UserAccount>[] = [
@@ -55,7 +53,6 @@ function UsersPage() {
         description="Administra las cuentas de acceso: crea usuarios, edita sus datos y rol, o desactívalos."
       />
 
-      <OrgNotice message={notice} />
       <OrgSection
         singular="usuario"
         plural="usuarios"

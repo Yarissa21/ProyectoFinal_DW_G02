@@ -4,12 +4,11 @@ import DocumentTypeStatusDialog from '../components/documentTypes/DocumentTypeSt
 import EmptyState from '../components/EmptyState';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingState from '../components/LoadingState';
-import OrgNotice from '../components/organization/OrgNotice';
 import ActiveBadge from '../components/organization/ActiveBadge';
 import PageHeader from '../components/PageHeader';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { useDocumentTypes } from '../hooks/useDocuments';
-import { useTimedNotice } from '../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import { describeError } from '../services/errorMessages';
 import { useAuthStore } from '../store/authStore';
 import type { DocumentType } from '../types/document';
@@ -36,7 +35,6 @@ function RequiredBadge({ required }: { required: boolean }) {
 function DocumentTypesPage() {
   const canManage = useAuthStore((state) => state.user?.role.code === 'ADMIN');
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useTimedNotice();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
   const debouncedSearch = useDebouncedValue(search.trim().toLowerCase());
@@ -46,7 +44,6 @@ function DocumentTypesPage() {
   const hasFilters = search.trim() !== '' || status !== 'all';
 
   const clearFilters = () => {
-    setNotice(null);
     setSearch('');
     setStatus('all');
   };
@@ -54,11 +51,10 @@ function DocumentTypesPage() {
   const close = () => setDialog(null);
   const saved = (message: string) => {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   };
 
   const openDialog = (next: DialogState) => {
-    setNotice(null);
     setDialog(next);
   };
 
@@ -217,8 +213,6 @@ function DocumentTypesPage() {
         }
       />
 
-      <OrgNotice message={notice} />
-
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
           <label htmlFor="doctype-search" className="mb-1.5 block text-sm font-medium text-slate-700">
@@ -230,7 +224,6 @@ function DocumentTypesPage() {
             value={search}
             placeholder="Código, nombre o descripción"
             onChange={(event) => {
-              setNotice(null);
               setSearch(event.target.value);
             }}
             className={controlClass}
@@ -245,7 +238,6 @@ function DocumentTypesPage() {
               id="doctype-status"
               value={status}
               onChange={(event) => {
-                setNotice(null);
                 setStatus(event.target.value as StatusFilter);
               }}
               className={controlClass}

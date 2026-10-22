@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import type { ErrorDescription } from '../services/errorMessages';
-
-const DETAIL_STATUSES = new Set([403, 409, 422, 503]);
+import { needsRequestId, type ErrorDescription } from '../services/errorMessages';
 
 interface ErrorAlertProps {
   error: ErrorDescription;
@@ -27,7 +25,7 @@ function formatTime(iso: string): string {
 
 function ErrorAlert({ error, onRetry, compact = false }: ErrorAlertProps) {
   const [copied, setCopied] = useState(false);
-  const showDetails = error.status !== undefined && DETAIL_STATUSES.has(error.status);
+  const showDetails = needsRequestId(error);
 
   const copyReport = async () => {
     try {

@@ -6,6 +6,7 @@ import LoadingState from '../components/LoadingState';
 import { useEmployeeCatalogs } from '../hooks/useEmployeeCatalogs';
 import { useCreateEmployee } from '../hooks/useEmployees';
 import { describeError } from '../services/errorMessages';
+import toast from 'react-hot-toast';
 
 function EmployeeCreatePage() {
   const navigate = useNavigate();
@@ -38,7 +39,8 @@ function EmployeeCreatePage() {
         cancelTo="/empleados"
         onSubmit={async (payload) => {
           const employee = await createEmployee.mutateAsync(payload);
-          navigate(`/empleados/${employee.id}`, { state: { notice: 'Empleado registrado correctamente.' } });
+          toast.success('Empleado registrado correctamente.');
+          navigate(`/empleados/${employee.id}`);
         }}
       />
     </section>

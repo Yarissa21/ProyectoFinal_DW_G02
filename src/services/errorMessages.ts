@@ -1,4 +1,5 @@
 import { ApiError } from './http';
+import toast from 'react-hot-toast';
 
 const MESSAGE_BY_CODE: Record<string, string> = {
   INVALID_CREDENTIALS: 'El correo o la contraseña son incorrectos.',
@@ -31,6 +32,7 @@ const MESSAGE_BY_STATUS: Record<number, string> = {
   503: 'El servicio no está disponible temporalmente. Inténtalo de nuevo en unos momentos.',
 };
 
+const DETAIL_STATUSES = new Set([403, 409, 422, 500, 503]);
 const FIXED_MESSAGE_STATUSES = new Set([0, 401, 403, 404, 429, 500, 503]);
 const RETRYABLE_STATUSES = new Set([0, 500, 503]);
 
@@ -72,4 +74,14 @@ export function describeError(error: unknown): ErrorDescription {
     };
   }
   return { message: 'Ocurrió un error inesperado.', retryable: false };
+}
+
+export function needsRequestId(error: ErrorDescription): boolean {
+  return error.status !== undefined && DETAIL_STATUSES.has(error.status);
+}
+
+export function toastOrReport(error: unknown, report: (description: ErrorDescription) => void): void {
+  const description = describeError(error);
+  if (needsRequestId(description)) report(description);
+  else toast.error(description.message);
 }
