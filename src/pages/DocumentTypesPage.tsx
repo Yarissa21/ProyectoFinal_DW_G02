@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import DocumentTypeDialog from '../components/documentTypes/DocumentTypeDialog';
 import DocumentTypeStatusDialog from '../components/documentTypes/DocumentTypeStatusDialog';
 import EmptyState from '../components/EmptyState';
@@ -21,6 +21,8 @@ const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600';
 const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const secondaryButtonClass =
   'whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 
@@ -37,6 +39,7 @@ function DocumentTypesPage() {
   const [dialog, setDialog] = useState<DialogState>(null);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
+  const searchRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(search.trim().toLowerCase());
 
   const query = useDocumentTypes(canManage);
@@ -46,6 +49,7 @@ function DocumentTypesPage() {
   const clearFilters = () => {
     setSearch('');
     setStatus('all');
+    searchRef.current?.focus();
   };
 
   const close = () => setDialog(null);
@@ -219,6 +223,7 @@ function DocumentTypesPage() {
             Buscar
           </label>
           <input
+            ref={searchRef}
             id="doctype-search"
             type="search"
             value={search}
@@ -247,6 +252,11 @@ function DocumentTypesPage() {
               <option value="inactive">Inactivos</option>
             </select>
           </div>
+        )}
+        {hasFilters && (
+          <button type="button" onClick={clearFilters} className={clearButtonClass}>
+            Limpiar filtros
+          </button>
         )}
       </div>
 

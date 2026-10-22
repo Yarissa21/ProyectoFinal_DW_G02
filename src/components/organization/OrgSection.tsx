@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import type { UseQueryResult } from '@tanstack/react-query';
 import EmptyState from '../EmptyState';
 import ErrorAlert from '../ErrorAlert';
@@ -39,6 +39,8 @@ const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
 const secondaryButtonClass =
   'whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
 
 function OrgSection<T extends { id: string; isActive: boolean }>({
@@ -58,6 +60,7 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
   const [status, setStatus] = useState<StatusFilter>('all');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(DEFAULT_PAGE_SIZE);
+  const searchRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(search.trim());
 
   const query = useList({
@@ -75,6 +78,7 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
     setSearch('');
     setStatus('all');
     setPage(1);
+    searchRef.current?.focus();
   };
 
   const rowActions = (item: T) => (
@@ -221,6 +225,7 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
             Buscar
           </label>
           <input
+            ref={searchRef}
             id={`org-search-${plural}`}
             type="search"
             value={search}
@@ -250,6 +255,11 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
             <option value="inactive">{feminine ? 'Inactivas' : 'Inactivos'}</option>
           </select>
         </div>
+        {hasFilters && (
+          <button type="button" onClick={clearFilters} className={clearButtonClass}>
+            Limpiar filtros
+          </button>
+        )}
         {canManage && (
           <button type="button" onClick={onCreate} className={primaryButtonClass}>
             + Nuev{feminine ? 'a' : 'o'} {singular}

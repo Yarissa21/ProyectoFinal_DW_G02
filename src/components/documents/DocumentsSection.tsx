@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import ErrorAlert from '../ErrorAlert';
 import LoadingState from '../LoadingState';
@@ -21,6 +21,8 @@ interface DocumentsSectionProps {
 type OpenDialog = 'upload' | 'delete' | null;
 
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const rowButtonClass =
   'rounded-md px-2 py-1 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-50';
 const controlClass =
@@ -178,6 +180,14 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
 
   const hasFilters = documentTypeId !== '';
 
+  const typeSelectRef = useRef<HTMLSelectElement>(null);
+
+  const clearFilters = () => {
+    setDocumentTypeId('');
+    setPage(1);
+    typeSelectRef.current?.focus();
+  };
+
   const openUpload = () => {
     setDialog('upload');
   };
@@ -238,15 +248,8 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           {hasFilters ? (
             <>
               <p>No hay documentos de ese tipo.</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setDocumentTypeId('');
-                  setPage(1);
-                }}
-                className="mt-2 rounded-md px-2 py-1 font-medium text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-              >
-                Quitar filtro
+              <button type="button" onClick={clearFilters} className={`${clearButtonClass} mt-3`}>
+                Limpiar filtros
               </button>
             </>
           ) : (
@@ -308,27 +311,35 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
 
       {fileError && <ErrorAlert error={fileError} />}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 sm:max-w-sm">
-        <label htmlFor="doc-filter-type" className="mb-1.5 block text-sm font-medium text-slate-700">
-          Tipo de documento
-        </label>
-        <select
-          id="doc-filter-type"
-          value={documentTypeId}
-          disabled={types.isPending}
-          onChange={(event) => {
-            setDocumentTypeId(event.target.value);
-            setPage(1);
-          }}
-          className={controlClass}
-        >
-          <option value="">Todos</option>
-          {types.data?.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
+            <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:max-w-lg sm:flex-row sm:items-end">
+        <div className="sm:flex-1">
+          <label htmlFor="doc-filter-type" className="mb-1.5 block text-sm font-medium text-slate-700">
+            Tipo de documento
+          </label>
+          <select
+            ref={typeSelectRef}
+            id="doc-filter-type"
+            value={documentTypeId}
+            disabled={types.isPending}
+            onChange={(event) => {
+              setDocumentTypeId(event.target.value);
+              setPage(1);
+            }}
+            className={controlClass}
+          >
+            <option value="">Todos</option>
+            {types.data?.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {hasFilters && (
+          <button type="button" onClick={clearFilters} className={clearButtonClass}>
+            Limpiar filtros
+          </button>
+        )}
       </div>
 
       {renderContent()}

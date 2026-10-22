@@ -21,6 +21,8 @@ interface AcademicRecordsSectionProps {
 type OpenDialog = 'create' | 'edit' | 'delete' | null;
 
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const rowButtonClass =
   'rounded-md px-2 py-1 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const controlClass =
@@ -208,12 +210,8 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
           {hasFilters ? (
             <>
               <p>No hay registros que coincidan con la búsqueda.</p>
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="mt-2 rounded-md px-2 py-1 font-medium text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-              >
-                Quitar filtros
+              <button type="button" onClick={clearFilters} className={`${clearButtonClass} mt-3`}>
+                Limpiar filtros
               </button>
             </>
           ) : (
@@ -318,12 +316,8 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
         </div>
         <div className="flex gap-2">
           {hasFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 underline hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-            >
-              Limpiar
+            <button type="button" onClick={clearFilters} className={clearButtonClass}>
+              Limpiar filtros
             </button>
           )}
         </div>

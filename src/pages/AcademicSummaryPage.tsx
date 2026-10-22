@@ -18,8 +18,8 @@ const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600';
 const secondaryButtonClass =
   'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60';
-const textButtonClass =
-  'rounded-md px-2 py-1 text-sm font-medium text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
 const numThClass = 'px-4 py-3 text-right text-xs font-semibold text-slate-600';
 
@@ -209,8 +209,8 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
       <EmptyState
         title="No hay empleados que coincidan con los filtros."
         action={
-          <button type="button" onClick={onClear} className={textButtonClass}>
-            Quitar filtros
+          <button type="button" onClick={onClear} className={secondaryButtonClass}>
+            Limpiar filtros
           </button>
         }
       />
@@ -335,7 +335,7 @@ function AcademicSummaryPage() {
         </div>
         <div>
           {hasFilters && (
-            <button type="button" onClick={clearFilters} className={textButtonClass}>
+            <button type="button" onClick={clearFilters} className={clearButtonClass}>
               Limpiar filtros
             </button>
           )}
