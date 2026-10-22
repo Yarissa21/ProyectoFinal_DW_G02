@@ -17,6 +17,10 @@ const MESSAGE_BY_CODE: Record<string, string> = {
   ACTIVE_DEPARTMENTS_REQUIRED:
     'El puesto necesita al menos un departamento activo y con su sede activa. Activa primero el departamento (y su sede) e inténtalo de nuevo.',
   CANNOT_DEACTIVATE_SELF: 'No puedes desactivar tu propia cuenta. Pide a otro administrador que lo haga.',
+  DEPARTMENT_HAS_CURRENT_EMPLOYEES:
+    'No se puede desactivar el departamento porque aún tiene empleados vigentes. Reasigna o retira a esos empleados e inténtalo de nuevo.',
+  POSITION_HAS_CURRENT_EMPLOYEES:
+    'No se puede desactivar el puesto porque aún tiene empleados vigentes. Reasigna o retira a esos empleados e inténtalo de nuevo.',
 };
 
 const MESSAGE_BY_STATUS: Record<number, string> = {

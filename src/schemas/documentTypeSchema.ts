@@ -1,13 +1,10 @@
 import { z } from 'zod';
+import { codeField } from './codeField';
 
 export const DOCUMENT_TYPE_FORM_FIELDS = ['code', 'name', 'description', 'isRequired'] as const;
 
 export const documentTypeSchema = z.object({
-  code: z
-    .string()
-    .trim()
-    .min(1, 'Ingresa el código')
-    .regex(/^[A-Za-z0-9_]+$/, 'Usa solo letras, números y guion bajo, sin espacios'),
+  code: codeField,
   name: z.string().trim().min(1, 'Ingresa el nombre'),
   description: z.string().trim(),
   isRequired: z.boolean(),
