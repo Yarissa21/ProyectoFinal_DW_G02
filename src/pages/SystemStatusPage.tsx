@@ -47,9 +47,9 @@ function SystemStatusPage() {
           Salud del API
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <HealthPanel title="Estado general" endpoint="GET /health" query={health} />
-          <HealthPanel title="Proceso activo" endpoint="GET /health/live" query={live} />
-          <HealthPanel title="Listo para recibir tráfico" endpoint="GET /health/ready" query={ready} />
+          <HealthPanel title="Estado general" query={health} />
+          <HealthPanel title="Proceso activo" query={live} />
+          <HealthPanel title="Listo para recibir tráfico" query={ready} />
         </div>
       </section>
 
@@ -61,13 +61,11 @@ function SystemStatusPage() {
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <PermissionPanel
             title="Acceso administrativo"
-            endpoint="GET /auth/permissions/admin"
             expectedAllowed={role === 'ADMIN'}
             query={adminCheck}
           />
           <PermissionPanel
             title="Acceso de recursos humanos"
-            endpoint="GET /auth/permissions/hr"
             expectedAllowed={role === 'ADMIN' || role === 'HR_MANAGER'}
             query={hrCheck}
           />

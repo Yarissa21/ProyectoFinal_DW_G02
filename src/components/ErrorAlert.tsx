@@ -40,20 +40,8 @@ function ErrorAlert({ error, onRetry, compact = false }: ErrorAlertProps) {
     'rounded-md border border-red-400 px-3 py-1.5 text-xs font-medium text-red-900 hover:bg-red-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-800';
 
   return (
-    <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900">
+      <div role="alert" data-compact={compact || undefined} className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900">
       <p className="font-semibold">{error.message}</p>
-
-      {showDetails && !compact && (error.code || error.requestId) && (
-        <p className="mt-1 text-xs">
-          {error.code && <>Código: {error.code}</>}
-          {error.code && error.requestId && ' · '}
-          {error.requestId && (
-            <>
-              ID: <span className="break-all">{error.requestId}</span>
-            </>
-          )}
-        </p>
-      )}
 
       {onRetry && error.retryable && (
         <button type="button" onClick={onRetry} className={`${buttonClass} mt-3`}>

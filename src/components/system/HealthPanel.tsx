@@ -7,7 +7,6 @@ import type { HealthResponse, LivenessResponse } from '../../types/health';
 
 interface HealthPanelProps {
   title: string;
-  endpoint: string;
   query: UseQueryResult<HealthResponse | LivenessResponse>;
 }
 
@@ -15,11 +14,11 @@ function hasDependencies(data: HealthResponse | LivenessResponse): data is Healt
   return 'dependencies' in data;
 }
 
-function HealthPanel({ title, endpoint, query }: HealthPanelProps) {
+function HealthPanel({ title, query }: HealthPanelProps) {
   const { data } = query;
 
   return (
-    <StatusPanel title={title} endpoint={endpoint}>
+    <StatusPanel title={title}>
       {query.isPending && (
         <p role="status" className="text-slate-600">
           Consultando…

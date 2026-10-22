@@ -24,8 +24,8 @@ const navItems: NavItem[] = [
     matchPaths: ['/academicos', '/usuarios'],
   },
   { path: '/empresa', label: 'Empresa', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
-  { path: '/sistema', label: 'Estado del sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
   { path: '/tipos-documentos', label: 'Tipos documentos', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
+  { path: '/sistema', label: 'Estado sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
 ];
 
 function isCurrent(item: NavItem, pathname: string): boolean {

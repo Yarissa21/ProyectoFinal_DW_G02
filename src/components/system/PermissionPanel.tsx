@@ -7,19 +7,18 @@ import type { AuthUser } from '../../types/auth';
 
 interface PermissionPanelProps {
   title: string;
-  endpoint: string;
   expectedAllowed: boolean;
   query: UseQueryResult<AuthUser>;
 }
 
-function PermissionPanel({ title, endpoint, expectedAllowed, query }: PermissionPanelProps) {
+function PermissionPanel({ title, expectedAllowed, query }: PermissionPanelProps) {
   const forbidden = query.error instanceof ApiError && query.error.status === 403 ? query.error : null;
   const allowed = query.isSuccess;
   const settled = allowed || forbidden !== null;
   const matches = settled ? allowed === expectedAllowed : null;
 
   return (
-    <StatusPanel title={title} endpoint={endpoint}>
+    <StatusPanel title={title}>
       {query.isPending && (
         <p role="status" className="text-slate-600">
           Verificando…
@@ -36,19 +35,7 @@ function PermissionPanel({ title, endpoint, expectedAllowed, query }: Permission
         </p>
       )}
 
-      {forbidden && (
-        <div className="space-y-1">
-          <p className="font-semibold text-amber-800">⚠ Acceso denegado (403)</p>
-          <p className="text-xs text-slate-600">
-            Código: {forbidden.code}
-            {forbidden.requestId && (
-              <>
-                {' · '}ID: <span className="break-all">{forbidden.requestId}</span>
-              </>
-            )}
-          </p>
-        </div>
-      )}
+      {forbidden && <p className="font-semibold text-amber-800">⚠ Acceso denegado (403)</p>}
 
       {matches !== null && (
         <p className="mt-2 text-xs text-slate-600">
