@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTimedNotice } from '../../hooks/useTimedNotice';
 import BranchDialog from './BranchDialog';
 import OrgNotice from './OrgNotice';
 import OrgSection, { type OrgColumn } from './OrgSection';
@@ -41,7 +42,7 @@ const COLUMNS: OrgColumn<Branch>[] = [
 
 function BranchesSection({ canManage }: { canManage: boolean }) {
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useTimedNotice();
 
   const close = () => setDialog(null);
   const saved = (message: string) => {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTimedNotice } from '../../hooks/useTimedNotice';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormField from '../employees/FormField';
@@ -22,7 +23,7 @@ interface Notice {
 function ContactForm({ profile }: { profile: SelfServiceProfile }) {
   const mutation = useUpdateMyContact();
   const [issue, setIssue] = useState<ServerIssue | null>(null);
-  const [notice, setNotice] = useState<Notice | null>(null);
+  const [notice, setNotice] = useTimedNotice<Notice>();
 
   const {
     register,

@@ -3,6 +3,7 @@ import {
   createBranch,
   createDepartment,
   createPosition,
+  getDepartment,
   listBranches,
   listDepartments,
   listPositions,
@@ -22,7 +23,6 @@ import type {
   UpdateDepartmentPayload,
   UpdateOrgStatusPayload,
   UpdatePositionPayload,
-  getDepartment,
 } from '../types/organization';
 import { catalogKeys } from './useEmployeeCatalogs';
 

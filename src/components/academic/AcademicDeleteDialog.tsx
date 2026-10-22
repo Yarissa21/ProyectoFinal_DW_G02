@@ -41,7 +41,7 @@ function DeleteConfirm({ record, onConfirm, onClose, onDeleted }: DeleteConfirmP
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-700">
-        Vas a eliminar el antecedente <span className="font-semibold">{record.title}</span> (
+        Vas a eliminar el registro <span className="font-semibold">{record.title}</span> (
         {ACADEMIC_TYPE_LABELS[record.type]}, {record.institution}).
       </p>
       <p className="text-sm text-slate-700">Dejará de aparecer en el expediente académico del empleado.</p>
@@ -64,7 +64,7 @@ function DeleteConfirm({ record, onConfirm, onClose, onDeleted }: DeleteConfirmP
           aria-busy={pending}
           className="rounded-lg bg-red-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:opacity-60"
         >
-          {pending ? 'Eliminando…' : 'Eliminar antecedente'}
+          {pending ? 'Eliminando…' : 'Eliminar registro'}
         </button>
       </div>
     </div>
@@ -75,7 +75,7 @@ function AcademicDeleteDialog({ employeeId, record, open, onClose, onDeleted }: 
   const mutation = useDeleteAcademicRecord(employeeId, record.id);
 
   return (
-    <Modal open={open} title="Eliminar antecedente académico" onClose={onClose} locked={mutation.isPending}>
+    <Modal open={open} title="Eliminar registro académico" onClose={onClose} locked={mutation.isPending}>
       <DeleteConfirm
         record={record}
         onConfirm={() => mutation.mutateAsync()}

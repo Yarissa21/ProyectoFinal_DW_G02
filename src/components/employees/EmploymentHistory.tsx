@@ -122,8 +122,8 @@ function HistoryCards({ items }: { items: EmploymentHistoryEntry[] }) {
 function EmploymentHistory({ employeeId }: EmploymentHistoryProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(DEFAULT_PAGE_SIZE);
-  const query = useEmploymentHistory(employeeId, { page, limit });
-
+  const query = useEmploymentHistory(employeeId, { page, limit, sortBy: 'createdAt', sortOrder: 'desc' });
+    
   const renderContent = () => {
     if (query.isPending) return <LoadingState label="Cargando historial…" />;
 

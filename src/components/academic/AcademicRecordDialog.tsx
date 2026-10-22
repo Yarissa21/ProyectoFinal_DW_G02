@@ -73,11 +73,11 @@ function AcademicForm({ record, onCreate, onUpdate, onClose, onSaved }: Academic
           return;
         }
         await onUpdate(payload);
-        onSaved('Antecedente académico actualizado correctamente.');
+        onSaved('Registro académico actualizado correctamente.');
         return;
       }
       await onCreate(toCreateAcademicPayload(values));
-      onSaved('Antecedente académico registrado correctamente.');
+      onSaved('Registro académico guardado correctamente.');
     } catch (error) {
       setIssue(
         resolveServerIssue(error, ACADEMIC_FORM_FIELDS, (field, message, focus) =>
@@ -159,7 +159,7 @@ function AcademicForm({ record, onCreate, onUpdate, onClose, onSaved }: Academic
           aria-busy={isSubmitting}
           className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-60"
         >
-          {isSubmitting ? 'Guardando…' : record ? 'Guardar cambios' : 'Registrar antecedente'}
+          {isSubmitting ? 'Guardando…' : record ? 'Guardar cambios' : 'Guardar registro'}
         </button>
       </div>
     </form>
@@ -174,7 +174,7 @@ function AcademicRecordDialog({ employeeId, record, open, onClose, onSaved }: Ac
   return (
     <Modal
       open={open}
-      title={record ? 'Editar antecedente académico' : 'Agregar antecedente académico'}
+      title={record ? 'Editar registro académico' : 'Agregar registro académico'}
       onClose={onClose}
       locked={pending}
     >

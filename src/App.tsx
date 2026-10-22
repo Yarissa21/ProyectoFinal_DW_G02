@@ -19,10 +19,12 @@ import SystemStatusPage from './pages/SystemStatusPage';
 import EmployeesSummaryPage from './pages/EmployeesSummaryPage';
 import MyProfilePage from './pages/MyProfilePage';
 import MyAcademicRecordsPage from './pages/MyAcademicRecordsPage';
+import MyDocumentsPage from './pages/MyDocumentsPage';
 import AcademicSummaryPage from './pages/AcademicSummaryPage';
 import OrganizationPage from './pages/OrganizationPage';
 import UsersPage from './pages/UsersPage';
 import EmployeesSectionLayout from './layouts/EmployeesSectionLayout';
+import DocumentTypesPage from './pages/DocumentTypesPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -51,6 +53,7 @@ function App() {
             <Route element={<RoleGuard allowedRoles={['ADMIN', 'HR_MANAGER']} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/empresa" element={<OrganizationPage />} />
+              <Route path="/tipos-documentos" element={<DocumentTypesPage />} />
               <Route element={<EmployeesSectionLayout />}>
                 <Route path="/empleados" element={<EmployeesPage />} />
                 <Route path="/empleados/resumen" element={<EmployeesSummaryPage />} />
@@ -68,6 +71,7 @@ function App() {
               <Route path="/inicio" element={<EmployeeHomePage />} />
               <Route path="/mi-perfil" element={<MyProfilePage />} />
               <Route path="/mis-academicos" element={<MyAcademicRecordsPage />} />
+              <Route path="/mis-documentos" element={<MyDocumentsPage />} />
             </Route>
           </Route>
         </Route>

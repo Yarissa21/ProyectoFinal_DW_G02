@@ -6,6 +6,7 @@ import LoadingState from '../components/LoadingState';
 import PageHeader from '../components/PageHeader';
 import Pagination from '../components/Pagination';
 import NotLinkedNotice, { NOT_LINKED_CODE } from '../components/selfService/NotLinkedNotice';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { useMyAcademicRecords } from '../hooks/useSelfService';
 import { describeError } from '../services/errorMessages';
 import type { AcademicRecord, AcademicRecordType } from '../types/academic';
@@ -33,7 +34,7 @@ function RecordsTable({ items }: { items: AcademicRecord[] }) {
   return (
     <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white lg:block">
       <table className="w-full min-w-[40rem] text-sm">
-        <caption className="sr-only">Mis antecedentes académicos</caption>
+        <caption className="sr-only">Mis registros académicos</caption>
         <thead className="border-b border-slate-200 bg-slate-50">
           <tr>
             <th scope="col" className={thClass}>
@@ -73,7 +74,7 @@ function RecordsTable({ items }: { items: AcademicRecord[] }) {
 
 function RecordsCards({ items }: { items: AcademicRecord[] }) {
   return (
-    <ul aria-label="Mis antecedentes académicos" className="space-y-3 lg:hidden">
+    <ul aria-label="Mis registros académicos" className="space-y-3 lg:hidden">
       {items.map((record) => (
         <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -110,33 +111,26 @@ function MyAcademicRecordsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(DEFAULT_PAGE_SIZE);
   const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
   const [type, setType] = useState<AcademicRecordType | ''>('');
 
+  const debouncedSearch = useDebouncedValue(searchInput.trim());
   const query = useMyAcademicRecords({
     page,
     limit,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     type: type || undefined,
   });
 
-  const hasFilters = search !== '' || type !== '';
-
-  const applySearch = (event: FormEvent) => {
-    event.preventDefault();
-    setSearch(searchInput.trim());
-    setPage(1);
-  };
+  const hasFilters = searchInput.trim() !== '' || type !== '';
 
   const clearFilters = () => {
     setSearchInput('');
-    setSearch('');
     setType('');
     setPage(1);
   };
 
   const renderContent = () => {
-    if (query.isPending) return <LoadingState label="Cargando tus antecedentes académicos…" />;
+    if (query.isPending) return <LoadingState label="Cargando tus registros académicos…" />;
 
     if (query.isError) {
       const error = describeError(query.error);
@@ -151,7 +145,7 @@ function MyAcademicRecordsPage() {
     if (items.length === 0) {
       return hasFilters ? (
         <EmptyState
-          title="No hay antecedentes que coincidan con la búsqueda."
+          title="No hay registros que coincidan con la búsqueda."
           action={
             <button type="button" onClick={clearFilters} className={textButtonClass}>
               Quitar filtros
@@ -160,7 +154,7 @@ function MyAcademicRecordsPage() {
         />
       ) : (
         <EmptyState
-          title="Todavía no tienes antecedentes académicos registrados."
+          title="Todavía no tienes registros académicos."
           description="Recursos Humanos registra los estudios en tu expediente. Si falta alguno, solicítalo con ellos."
         />
       );
@@ -188,7 +182,7 @@ function MyAcademicRecordsPage() {
     <section aria-labelledby="my-academic-title" className="space-y-6">
       <PageHeader
         id="my-academic-title"
-        title="Mis antecedentes académicos"
+        title="Mis registros académicos"
         description="Títulos, certificaciones y cursos registrados en tu expediente."
         actions={
           <Link to="/inicio" className={secondaryButtonClass}>
@@ -199,8 +193,8 @@ function MyAcademicRecordsPage() {
 
       <form
         role="search"
-        aria-label="Buscar en mis antecedentes académicos"
-        onSubmit={applySearch}
+        aria-label="Buscar en mis registros académicos"
+        onSubmit={(event: FormEvent) => event.preventDefault()}
         className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto] sm:items-end"
       >
         <div>
@@ -211,7 +205,10 @@ function MyAcademicRecordsPage() {
             id="my-acad-search"
             type="search"
             value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
             placeholder="Título, institución o código"
             className={controlClass}
           />
@@ -238,9 +235,6 @@ function MyAcademicRecordsPage() {
           </select>
         </div>
         <div className="flex gap-2">
-          <button type="submit" className={secondaryButtonClass}>
-            Buscar
-          </button>
           {hasFilters && (
             <button type="button" onClick={clearFilters} className={textButtonClass}>
               Limpiar

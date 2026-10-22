@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTimedNotice } from '../../hooks/useTimedNotice';
 import OrgNotice from './OrgNotice';
 import OrgSection, { type OrgColumn } from './OrgSection';
 import OrgStatusDialog from './OrgStatusDialog';
@@ -32,7 +33,7 @@ const COLUMNS: OrgColumn<Position>[] = [
 
 function PositionsSection({ canManage }: { canManage: boolean }) {
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useTimedNotice();
 
   const close = () => setDialog(null);
   const saved = (message: string) => {

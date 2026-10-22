@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react';
+import { useTimedNotice } from '../../hooks/useTimedNotice';
 import ErrorAlert from '../ErrorAlert';
 import LoadingState from '../LoadingState';
 import Pagination from '../Pagination';
 import AcademicDeleteDialog from './AcademicDeleteDialog';
 import AcademicRecordDialog from './AcademicRecordDialog';
 import { useAcademicRecords } from '../../hooks/useAcademicRecords';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { describeError } from '../../services/errorMessages';
 import type { AcademicRecord, AcademicRecordType } from '../../types/academic';
 import { ACADEMIC_TYPE_LABELS, ACADEMIC_TYPE_VALUES } from '../../utils/academicLabels';
@@ -65,7 +67,7 @@ function AcademicTable({ items, onEdit, onDelete }: { items: AcademicRecord[] } 
   return (
     <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white lg:block">
       <table className="w-full min-w-[44rem] text-sm">
-        <caption className="sr-only">Antecedentes académicos</caption>
+        <caption className="sr-only">Registros académicos</caption>
         <thead className="border-b border-slate-200 bg-slate-50">
           <tr>
             <th scope="col" className={thClass}>
@@ -111,7 +113,7 @@ function AcademicTable({ items, onEdit, onDelete }: { items: AcademicRecord[] } 
 
 function AcademicCards({ items, onEdit, onDelete }: { items: AcademicRecord[] } & Omit<RowActionsProps, 'record'>) {
   return (
-    <ul aria-label="Antecedentes académicos" className="space-y-3 lg:hidden">
+    <ul aria-label="Registros académicos" className="space-y-3 lg:hidden">
       {items.map((record) => (
         <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -151,20 +153,20 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(DEFAULT_PAGE_SIZE);
   const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
   const [type, setType] = useState<AcademicRecordType | ''>('');
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [selected, setSelected] = useState<AcademicRecord | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useTimedNotice();
 
+  const debouncedSearch = useDebouncedValue(searchInput.trim());
   const query = useAcademicRecords(employeeId, {
     page,
     limit,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     type: type || undefined,
   });
 
-  const hasFilters = search !== '' || type !== '';
+  const hasFilters = searchInput.trim() !== '' || type !== '';
 
   const closeDialog = () => setDialog(null);
 
@@ -189,21 +191,15 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
     setDialog('delete');
   };
 
-  const applySearch = (event: FormEvent) => {
-    event.preventDefault();
-    setSearch(searchInput.trim());
-    setPage(1);
-  };
-
   const clearFilters = () => {
+    setNotice(null);
     setSearchInput('');
-    setSearch('');
     setType('');
     setPage(1);
   };
 
   const renderContent = () => {
-    if (query.isPending) return <LoadingState label="Cargando antecedentes académicos…" />;
+    if (query.isPending) return <LoadingState label="Cargando registros académicos…" />;
 
     if (query.isError) {
       return <ErrorAlert error={describeError(query.error)} onRetry={() => void query.refetch()} />;
@@ -216,7 +212,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-600">
           {hasFilters ? (
             <>
-              <p>No hay antecedentes que coincidan con la búsqueda.</p>
+              <p>No hay registros que coincidan con la búsqueda.</p>
               <button
                 type="button"
                 onClick={clearFilters}
@@ -227,7 +223,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             </>
           ) : (
             <>
-              <p>{employeeName} todavía no tiene antecedentes académicos registrados.</p>
+              <p>{employeeName} todavía no tiene registros académicos.</p>
               <button
                 type="button"
                 onClick={openCreate}
@@ -249,8 +245,12 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
           meta={meta}
           pageSizes={PAGE_SIZES}
           disabled={query.isFetching}
-          onPageChange={setPage}
+          onPageChange={(value) => {
+            setNotice(null);
+            setPage(value);
+          }}
           onLimitChange={(value) => {
+            setNotice(null);
             setLimit(value);
             setPage(1);
           }}
@@ -267,7 +267,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
         <div>
           <h2 id="academic-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
             <span aria-hidden="true" className="h-5 w-1 rounded-full bg-blue-500" />
-            Antecedentes académicos
+            Registros académicos
           </h2>
           <p className="text-sm text-slate-600">Títulos, certificaciones y cursos del empleado.</p>
         </div>
@@ -276,7 +276,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
           onClick={openCreate}
           className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
-          Agregar antecedente
+          Agregar registro
         </button>
       </div>
 
@@ -288,8 +288,8 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
 
       <form
         role="search"
-        aria-label="Buscar antecedentes académicos"
-        onSubmit={applySearch}
+        aria-label="Buscar registros académicos"
+        onSubmit={(event: FormEvent) => event.preventDefault()}
         className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto] sm:items-end"
       >
         <div>
@@ -300,7 +300,11 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             id="acad-search"
             type="search"
             value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
+            onChange={(event) => {
+              setNotice(null);
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
             placeholder="Título, institución o código"
             className={controlClass}
           />
@@ -313,6 +317,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             id="acad-filter-type"
             value={type}
             onChange={(event) => {
+              setNotice(null);
               setType(event.target.value as AcademicRecordType | '');
               setPage(1);
             }}
@@ -327,12 +332,6 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
           </select>
         </div>
         <div className="flex gap-2">
-          <button
-            type="submit"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-          >
-            Buscar
-          </button>
           {hasFilters && (
             <button
               type="button"
@@ -374,7 +373,7 @@ function AcademicRecordsSection({ employeeId, employeeName }: AcademicRecordsSec
             onClose={closeDialog}
             onDeleted={() => {
               setDialog(null);
-              setNotice('Antecedente académico eliminado correctamente.');
+              setNotice('Registro académico eliminado correctamente.');
               if (currentItems.length === 1 && page > 1) setPage(page - 1);
             }}
           />
