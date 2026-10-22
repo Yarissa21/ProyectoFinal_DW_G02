@@ -26,6 +26,7 @@ const navItems: NavItem[] = [
   { path: '/empresa', label: 'Empresa', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/tipos-documentos', label: 'Tipos documentos', allowedRoles: ['ADMIN', 'HR_MANAGER'] },
   { path: '/sistema', label: 'Estado sistema', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
+  { path: '/equipo', label: 'Equipo', allowedRoles: ['ADMIN', 'HR_MANAGER', 'EMPLOYEE'] },
 ];
 
 function isCurrent(item: NavItem, pathname: string): boolean {
@@ -147,7 +148,7 @@ function AppLayout() {
                 key={item.path}
                 to={item.path}
                 aria-current={isCurrent(item, pathname) ? 'page' : undefined}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium ${focusClass} ${
+                className={`flex items-center justify-center rounded-md px-3 py-1.5 text-center text-sm font-medium ${focusClass} ${
                   isCurrent(item, pathname) ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
                 }`}
               >

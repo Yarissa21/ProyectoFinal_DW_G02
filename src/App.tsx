@@ -26,6 +26,7 @@ import UsersPage from './pages/UsersPage';
 import EmployeesSectionLayout from './layouts/EmployeesSectionLayout';
 import DocumentTypesPage from './pages/DocumentTypesPage';
 import { Toaster } from 'react-hot-toast';
+import TeamPage from './pages/TeamPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -63,6 +64,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/sistema" element={<SystemStatusPage />} />
+            <Route path="/equipo" element={<TeamPage />} />
 
             <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
               <Route path="/empleados/:id/usuario" element={<EmployeeLinkUserPage />} />
