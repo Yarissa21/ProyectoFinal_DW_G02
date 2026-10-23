@@ -25,6 +25,8 @@ import OrganizationPage from './pages/OrganizationPage';
 import UsersPage from './pages/UsersPage';
 import EmployeesSectionLayout from './layouts/EmployeesSectionLayout';
 import DocumentTypesPage from './pages/DocumentTypesPage';
+import { Toaster } from 'react-hot-toast';
+import TeamPage from './pages/TeamPage';
 
 function HomeRedirect() {
   const user = useAuthStore((state) => state.user);
@@ -38,6 +40,23 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        containerStyle={{ top: 80 }}
+        toastOptions={{
+          duration: 6000,
+          style: {
+            background: '#1e293b',
+            color: '#ffffff',
+            borderRadius: '0.75rem',
+            fontSize: '0.875rem',
+            padding: '0.75rem 1rem',
+            maxWidth: '24rem',
+          },
+          success: { iconTheme: { primary: '#22c55e', secondary: '#ffffff' } },
+          error: { duration: 10000, iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
+        }}
+      />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
@@ -45,6 +64,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/sistema" element={<SystemStatusPage />} />
+            <Route path="/equipo" element={<TeamPage />} />
 
             <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
               <Route path="/empleados/:id/usuario" element={<EmployeeLinkUserPage />} />

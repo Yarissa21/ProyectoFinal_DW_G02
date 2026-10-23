@@ -8,7 +8,7 @@ import Pagination from '../components/Pagination';
 import NotLinkedNotice, { NOT_LINKED_CODE } from '../components/selfService/NotLinkedNotice';
 import { useMyDocuments } from '../hooks/useMyDocuments';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
-import { describeError, type ErrorDescription } from '../services/errorMessages';
+import { describeError, toastOrReport, type ErrorDescription } from '../services/errorMessages';
 import { fetchMyDocumentFile } from '../services/myDocumentService';
 import type { MyDocument } from '../types/document';
 import { canPreviewDocument, formatFileSize, openBlobInTab, saveBlob } from '../utils/documentFiles';
@@ -20,8 +20,8 @@ const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600';
 const secondaryButtonClass =
   'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
-const textButtonClass =
-  'rounded-md px-2 py-1 text-sm font-medium text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const rowButtonClass =
   'rounded-md px-2 py-1 text-sm font-medium text-blue-800 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-50';
 
@@ -160,7 +160,7 @@ function MyDocumentsPage() {
       const blob = await fetchMyDocumentFile(document.id);
       saveBlob(blob, document.originalName);
     } catch (error) {
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
@@ -175,7 +175,7 @@ function MyDocumentsPage() {
       openBlobInTab(new Blob([blob], { type: document.mimeType }), tab, document.originalName);
     } catch (error) {
       tab?.close();
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
@@ -205,8 +205,8 @@ function MyDocumentsPage() {
         <EmptyState
           title="No hay documentos que coincidan con la búsqueda."
           action={
-            <button type="button" onClick={clearFilters} className={textButtonClass}>
-              Quitar filtros
+            <button type="button" onClick={clearFilters} className={secondaryButtonClass}>
+              Limpiar filtros
             </button>
           }
         />
@@ -273,8 +273,8 @@ function MyDocumentsPage() {
         </div>
         <div className="flex gap-2">
           {hasFilters && (
-            <button type="button" onClick={clearFilters} className={textButtonClass}>
-              Limpiar
+            <button type="button" onClick={clearFilters} className={clearButtonClass}>
+              Limpiar filtros
             </button>
           )}
         </div>

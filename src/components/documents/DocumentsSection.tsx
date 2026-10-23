@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useTimedNotice } from '../../hooks/useTimedNotice';
+import { useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import ErrorAlert from '../ErrorAlert';
 import LoadingState from '../LoadingState';
 import Pagination from '../Pagination';
 import DocumentDeleteDialog from './DocumentDeleteDialog';
 import DocumentUploadDialog from './DocumentUploadDialog';
 import { useDocumentTypes, useEmployeeDocuments } from '../../hooks/useDocuments';
-import { describeError, type ErrorDescription } from '../../services/errorMessages';
+import { describeError, toastOrReport, type ErrorDescription } from '../../services/errorMessages';
 import { fetchEmployeeDocumentFile } from '../../services/documentService';
 import type { EmployeeDocument } from '../../types/document';
 import { canPreviewDocument, formatFileSize, openBlobInTab, saveBlob } from '../../utils/documentFiles';
@@ -21,6 +21,8 @@ interface DocumentsSectionProps {
 type OpenDialog = 'upload' | 'delete' | null;
 
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const rowButtonClass =
   'rounded-md px-2 py-1 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-50';
 const controlClass =
@@ -166,7 +168,6 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
   const [documentTypeId, setDocumentTypeId] = useState('');
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [selected, setSelected] = useState<EmployeeDocument | null>(null);
-  const [notice, setNotice] = useTimedNotice();
   const [fileError, setFileError] = useState<ErrorDescription | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -179,33 +180,37 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
 
   const hasFilters = documentTypeId !== '';
 
+  const typeSelectRef = useRef<HTMLSelectElement>(null);
+
+  const clearFilters = () => {
+    setDocumentTypeId('');
+    setPage(1);
+    typeSelectRef.current?.focus();
+  };
+
   const openUpload = () => {
-    setNotice(null);
     setDialog('upload');
   };
 
   const openDelete = (document: EmployeeDocument) => {
-    setNotice(null);
     setSelected(document);
     setDialog('delete');
   };
 
   const handleDownload = async (document: EmployeeDocument) => {
-    setNotice(null);
     setFileError(null);
     setBusyId(document.id);
     try {
       const blob = await fetchEmployeeDocumentFile(document.id);
       saveBlob(blob, document.originalName);
     } catch (error) {
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
   };
 
   const handleView = async (document: EmployeeDocument) => {
-    setNotice(null);
     setFileError(null);
     setBusyId(document.id);
     const tab = window.open('', '_blank');
@@ -215,7 +220,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
       openBlobInTab(typed, tab, document.originalName);
     } catch (error) {
       tab?.close();
-      setFileError(describeError(error));
+      toastOrReport(error, setFileError);
     } finally {
       setBusyId(null);
     }
@@ -243,16 +248,8 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           {hasFilters ? (
             <>
               <p>No hay documentos de ese tipo.</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setNotice(null);
-                  setDocumentTypeId('');
-                  setPage(1);
-                }}
-                className="mt-2 rounded-md px-2 py-1 font-medium text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-              >
-                Quitar filtro
+              <button type="button" onClick={clearFilters} className={`${clearButtonClass} mt-3`}>
+                Limpiar filtros
               </button>
             </>
           ) : (
@@ -280,11 +277,9 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           pageSizes={PAGE_SIZES}
           disabled={query.isFetching}
           onPageChange={(value) => {
-            setNotice(null);
             setPage(value);
           }}
           onLimitChange={(value) => {
-            setNotice(null);
             setLimit(value);
             setPage(1);
           }}
@@ -314,36 +309,37 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
         </button>
       </div>
 
-      {notice && (
-        <p role="status" className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900">
-          {notice}
-        </p>
-      )}
-
       {fileError && <ErrorAlert error={fileError} />}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 sm:max-w-sm">
-        <label htmlFor="doc-filter-type" className="mb-1.5 block text-sm font-medium text-slate-700">
-          Tipo de documento
-        </label>
-        <select
-          id="doc-filter-type"
-          value={documentTypeId}
-          disabled={types.isPending}
-          onChange={(event) => {
-            setNotice(null);
-            setDocumentTypeId(event.target.value);
-            setPage(1);
-          }}
-          className={controlClass}
-        >
-          <option value="">Todos</option>
-          {types.data?.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
+            <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:max-w-lg sm:flex-row sm:items-end">
+        <div className="sm:flex-1">
+          <label htmlFor="doc-filter-type" className="mb-1.5 block text-sm font-medium text-slate-700">
+            Tipo de documento
+          </label>
+          <select
+            ref={typeSelectRef}
+            id="doc-filter-type"
+            value={documentTypeId}
+            disabled={types.isPending}
+            onChange={(event) => {
+              setDocumentTypeId(event.target.value);
+              setPage(1);
+            }}
+            className={controlClass}
+          >
+            <option value="">Todos</option>
+            {types.data?.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {hasFilters && (
+          <button type="button" onClick={clearFilters} className={clearButtonClass}>
+            Limpiar filtros
+          </button>
+        )}
       </div>
 
       {renderContent()}
@@ -354,7 +350,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
         onClose={() => setDialog(null)}
         onUploaded={(message) => {
           setDialog(null);
-          setNotice(message);
+          toast.success(message);
         }}
       />
 
@@ -367,7 +363,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
           onClose={() => setDialog(null)}
           onDeleted={() => {
             setDialog(null);
-            setNotice('Documento eliminado correctamente.');
+            toast.success('Documento eliminado correctamente.');
             if (currentCount === 1 && page > 1) setPage(page - 1);
           }}
         />

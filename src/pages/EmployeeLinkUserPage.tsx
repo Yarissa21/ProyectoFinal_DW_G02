@@ -8,6 +8,7 @@ import LoadingState from '../components/LoadingState';
 import PageHeader from '../components/PageHeader';
 import { useEmployee, useUpdateEmployee } from '../hooks/useEmployees';
 import { describeError } from '../services/errorMessages';
+import toast from 'react-hot-toast';
 import type { Employee } from '../types/employee';
 import { fullName } from '../utils/format';
 import type { ServerIssue } from '../utils/formErrors';
@@ -24,7 +25,8 @@ function LinkUserForm({ employee }: { employee: Employee }) {
     setIssue(null);
     try {
       await updateEmployee.mutateAsync({ userId });
-      navigate(`/empleados/${employee.id}`, { state: { notice: 'Usuario vinculado correctamente.' } });
+      toast.success('Usuario vinculado correctamente.');
+      navigate(`/empleados/${employee.id}`);
     } catch (error) {
       setIssue({ error: describeError(error), extra: [] });
     }

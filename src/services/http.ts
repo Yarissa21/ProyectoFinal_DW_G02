@@ -68,6 +68,18 @@ function toApiError(error: AxiosError<ApiErrorBody>): ApiError {
   });
 }
 
+async function parseBlobError(error: AxiosError<ApiErrorBody>): Promise<void> {
+  const response = error.response;
+  if (!response) return;
+  const raw: unknown = response.data;
+  if (!(raw instanceof Blob)) return;
+  try {
+    response.data = JSON.parse(await raw.text()) as ApiErrorBody;
+  } catch {
+    response.data = undefined as unknown as ApiErrorBody;
+  }
+}
+
 function isAuthEndpoint(url: string | undefined): boolean {
   return !!url && (url.startsWith('/auth/login') || url.startsWith('/auth/refresh'));
 }
@@ -125,6 +137,7 @@ type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorBody>) => {
+    await parseBlobError(error);
     const original = error.config as RetriableConfig | undefined;
 
     if (error.response?.status === 401 && original && !original._retry && !isAuthEndpoint(original.url)) {

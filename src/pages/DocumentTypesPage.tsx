@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import DocumentTypeDialog from '../components/documentTypes/DocumentTypeDialog';
 import DocumentTypeStatusDialog from '../components/documentTypes/DocumentTypeStatusDialog';
 import EmptyState from '../components/EmptyState';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingState from '../components/LoadingState';
-import OrgNotice from '../components/organization/OrgNotice';
 import ActiveBadge from '../components/organization/ActiveBadge';
 import PageHeader from '../components/PageHeader';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { useDocumentTypes } from '../hooks/useDocuments';
-import { useTimedNotice } from '../hooks/useTimedNotice';
+import toast from 'react-hot-toast';
 import { describeError } from '../services/errorMessages';
 import { useAuthStore } from '../store/authStore';
 import type { DocumentType } from '../types/document';
@@ -22,6 +21,8 @@ const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600';
 const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const secondaryButtonClass =
   'whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 
@@ -36,9 +37,9 @@ function RequiredBadge({ required }: { required: boolean }) {
 function DocumentTypesPage() {
   const canManage = useAuthStore((state) => state.user?.role.code === 'ADMIN');
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useTimedNotice();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
+  const searchRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(search.trim().toLowerCase());
 
   const query = useDocumentTypes(canManage);
@@ -46,19 +47,18 @@ function DocumentTypesPage() {
   const hasFilters = search.trim() !== '' || status !== 'all';
 
   const clearFilters = () => {
-    setNotice(null);
     setSearch('');
     setStatus('all');
+    searchRef.current?.focus();
   };
 
   const close = () => setDialog(null);
   const saved = (message: string) => {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   };
 
   const openDialog = (next: DialogState) => {
-    setNotice(null);
     setDialog(next);
   };
 
@@ -217,20 +217,18 @@ function DocumentTypesPage() {
         }
       />
 
-      <OrgNotice message={notice} />
-
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
           <label htmlFor="doctype-search" className="mb-1.5 block text-sm font-medium text-slate-700">
             Buscar
           </label>
           <input
+            ref={searchRef}
             id="doctype-search"
             type="search"
             value={search}
             placeholder="Código, nombre o descripción"
             onChange={(event) => {
-              setNotice(null);
               setSearch(event.target.value);
             }}
             className={controlClass}
@@ -245,7 +243,6 @@ function DocumentTypesPage() {
               id="doctype-status"
               value={status}
               onChange={(event) => {
-                setNotice(null);
                 setStatus(event.target.value as StatusFilter);
               }}
               className={controlClass}
@@ -255,6 +252,11 @@ function DocumentTypesPage() {
               <option value="inactive">Inactivos</option>
             </select>
           </div>
+        )}
+        {hasFilters && (
+          <button type="button" onClick={clearFilters} className={clearButtonClass}>
+            Limpiar filtros
+          </button>
         )}
       </div>
 

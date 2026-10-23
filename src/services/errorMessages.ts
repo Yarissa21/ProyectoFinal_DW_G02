@@ -1,4 +1,5 @@
 import { ApiError } from './http';
+import toast from 'react-hot-toast';
 
 const MESSAGE_BY_CODE: Record<string, string> = {
   INVALID_CREDENTIALS: 'El correo o la contraseña son incorrectos.',
@@ -16,6 +17,15 @@ const MESSAGE_BY_CODE: Record<string, string> = {
   ACTIVE_DEPARTMENTS_REQUIRED:
     'El puesto necesita al menos un departamento activo y con su sede activa. Activa primero el departamento (y su sede) e inténtalo de nuevo.',
   CANNOT_DEACTIVATE_SELF: 'No puedes desactivar tu propia cuenta. Pide a otro administrador que lo haga.',
+  DEPARTMENT_HAS_CURRENT_EMPLOYEES:
+    'No se puede desactivar el departamento porque aún tiene empleados vigentes. Reasigna o retira a esos empleados e inténtalo de nuevo.',
+  POSITION_HAS_CURRENT_EMPLOYEES:
+    'No se puede desactivar el puesto porque aún tiene empleados vigentes. Reasigna o retira a esos empleados e inténtalo de nuevo.',
+  BRANCH_ALREADY_EXISTS: 'Ya existe una sede con ese código o nombre. Usa otro código u otro nombre.',
+  DEPARTMENT_ALREADY_EXISTS: 'Ya existe un departamento con ese código o nombre. Usa otro código u otro nombre.',
+  POSITION_ALREADY_EXISTS: 'Ya existe un puesto con ese código o nombre. Usa otro código u otro nombre.',
+  DOCUMENT_TYPE_ALREADY_EXISTS: 'Ya existe un tipo de documento con ese código o nombre. Usa otro código u otro nombre.',
+  USER_EMAIL_ALREADY_EXISTS: 'Ya existe un usuario con ese correo electrónico. Usa otro correo.',
 };
 
 const MESSAGE_BY_STATUS: Record<number, string> = {
@@ -31,6 +41,7 @@ const MESSAGE_BY_STATUS: Record<number, string> = {
   503: 'El servicio no está disponible temporalmente. Inténtalo de nuevo en unos momentos.',
 };
 
+const DETAIL_STATUSES = new Set([403, 409, 422, 500, 503]);
 const FIXED_MESSAGE_STATUSES = new Set([0, 401, 403, 404, 429, 500, 503]);
 const RETRYABLE_STATUSES = new Set([0, 500, 503]);
 
@@ -72,4 +83,14 @@ export function describeError(error: unknown): ErrorDescription {
     };
   }
   return { message: 'Ocurrió un error inesperado.', retryable: false };
+}
+
+export function needsRequestId(error: ErrorDescription): boolean {
+  return error.status !== undefined && DETAIL_STATUSES.has(error.status);
+}
+
+export function toastOrReport(error: unknown, report: (description: ErrorDescription) => void): void {
+  const description = describeError(error);
+  if (needsRequestId(description)) report(description);
+  else toast.error(description.message);
 }

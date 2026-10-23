@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useTimedNotice } from '../hooks/useTimedNotice';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { EmploymentStatusBadge } from '../components/EmployeeBadges';
 import AcademicRecordsSection from '../components/academic/AcademicRecordsSection';
 import DocumentsSection from '../components/documents/DocumentsSection';
@@ -37,19 +37,10 @@ const dangerButtonClass =
 
 function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
-  const navigate = useNavigate();
   const role = useAuthStore((state) => state.user?.role.code);
   const query = useEmployee(id);
-  const [notice, setNotice] = useTimedNotice((location.state as { notice?: string } | null)?.notice ?? null);
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [section, setSection] = useState<DetailSection>('info');
-
-  useEffect(() => {
-    if ((location.state as { notice?: string } | null)?.notice) {
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.state, location.pathname, navigate]);
 
   if (query.isPending) return <LoadingState label="Cargando empleado…" />;
 
@@ -67,18 +58,11 @@ function EmployeeDetailPage() {
   const canDelete = isAdmin && employee.status !== 'RETIRED';
 
   const openDialog = (next: OpenDialog) => {
-    setNotice(null);
     setDialog(next);
   };
 
   return (
     <section aria-labelledby="employee-title" className="space-y-6">
-      {notice && (
-        <p role="status" className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900">
-          {notice}
-        </p>
-      )}
-
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <BackLink to="/empleados">Volver al listado</BackLink>
@@ -118,7 +102,6 @@ function EmployeeDetailPage() {
           tabs={TABS}
           active={section}
           onChange={(id) => {
-            setNotice(null);
             setSection(id as DetailSection);
           }}
         />
@@ -140,7 +123,7 @@ function EmployeeDetailPage() {
         onClose={() => setDialog(null)}
         onSaved={() => {
           setDialog(null);
-          setNotice('Estado laboral actualizado correctamente.');
+          toast.success('Estado laboral actualizado correctamente.');
         }}
       />
 
@@ -151,7 +134,7 @@ function EmployeeDetailPage() {
           onClose={() => setDialog(null)}
           onDeleted={() => {
             setDialog(null);
-            setNotice('Empleado dado de baja correctamente.');
+            toast.success('Empleado dado de baja correctamente.');
           }}
         />
       )}

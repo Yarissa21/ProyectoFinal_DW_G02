@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useTimedNotice } from '../../hooks/useTimedNotice';
-import OrgNotice from './OrgNotice';
+import toast from 'react-hot-toast';
 import OrgSection, { type OrgColumn } from './OrgSection';
 import OrgStatusDialog from './OrgStatusDialog';
 import PositionDialog from './PositionDialog';
@@ -33,17 +32,15 @@ const COLUMNS: OrgColumn<Position>[] = [
 
 function PositionsSection({ canManage }: { canManage: boolean }) {
   const [dialog, setDialog] = useState<DialogState>(null);
-  const [notice, setNotice] = useTimedNotice();
 
   const close = () => setDialog(null);
   const saved = (message: string) => {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   };
 
   return (
     <div className="space-y-4">
-      <OrgNotice message={notice} />
       <OrgSection
         singular="puesto"
         plural="puestos"

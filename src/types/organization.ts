@@ -34,6 +34,7 @@ export interface OrgListParams {
   page?: number;
   limit?: number;
   search?: string;
+  branchId?: string;
   isActive?: boolean;
   sortBy?: string;
   sortOrder?: SortOrder;
