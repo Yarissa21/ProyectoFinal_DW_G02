@@ -10,6 +10,7 @@ import { describeError } from '../services/errorMessages';
 import { formatCount, formatPercentage, PAYROLL_STATUS_LABELS } from '../utils/dashboardLabels';
 import { formatDate, formatDateTime } from '../utils/format';
 import type { DashboardReport, DashboardWorkforce } from '../types/dashboard';
+import { STAT_GRID_CLASS } from '../utils/statGrid';
 
 const secondaryButtonClass =
   'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60';
@@ -43,7 +44,7 @@ function WorkforceSection({ workforce }: { workforce: DashboardWorkforce }) {
   return (
     <section aria-labelledby="group-workforce" className="space-y-3">
       <SectionTitle id="group-workforce">Personal</SectionTitle>
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <dl className={`${STAT_GRID_CLASS} lg:grid-cols-4`}>
         <StatCard compact tone="brand" label="Total de empleados" value={formatCount(workforce.total)} />
         <StatCard compact tone="success" label="Activos" value={formatCount(workforce.active)} />
         <StatCard compact tone="warning" label="Suspendidos" value={formatCount(workforce.suspended)} />

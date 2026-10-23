@@ -6,6 +6,7 @@ import ProfileLoader from '../components/selfService/ProfileLoader';
 import { useAuthStore } from '../store/authStore';
 import type { SelfServiceProfile } from '../types/selfService';
 import { formatDate } from '../utils/format';
+import { STAT_GRID_CLASS } from '../utils/statGrid';
 
 const cardLinkClass =
   'block rounded-xl border border-slate-200 bg-white p-5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
@@ -13,7 +14,7 @@ const cardLinkClass =
 function HomeContent({ profile }: { profile: SelfServiceProfile }) {
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <dl className={`${STAT_GRID_CLASS} lg:grid-cols-4`}>
         <StatCard
           tone="success"
           label="Estado laboral"
@@ -39,7 +40,7 @@ function HomeContent({ profile }: { profile: SelfServiceProfile }) {
         />
       </dl>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:[&>:last-child:nth-child(odd)]:col-span-2">
         <Link to="/mi-perfil" className={cardLinkClass}>
           <h2 className="font-semibold text-slate-900">Mi perfil y contacto</h2>
           <p className="mt-1 text-sm text-slate-600">

@@ -34,5 +34,5 @@ export const EMPLOYMENT_STATUS_VALUES = Object.keys(EMPLOYMENT_STATUS_LABELS) as
 export const RECORD_STATUS_VALUES = Object.keys(RECORD_STATUS_LABELS) as RecordStatus[];
 export const SORT_FIELD_VALUES = Object.keys(SORT_FIELD_LABELS) as EmployeeSortField[];
 
-export const PAGE_SIZES = [10, 20, 50] as const;
-export const DEFAULT_PAGE_SIZE = 10;
+export const PAGE_SIZES = [5, 10, 20, 50] as const;
+export const DEFAULT_PAGE_SIZE = 5;

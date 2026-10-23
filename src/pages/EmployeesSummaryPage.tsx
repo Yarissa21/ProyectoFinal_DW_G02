@@ -12,6 +12,7 @@ import { formatDateTime, formatMoney } from '../utils/format';
 import type { EmployeeSummaryReport } from '../types/employee';
 import { usePdfExport } from '../hooks/usePdfExport';
 import { fetchEmployeesSummaryPdf } from '../services/employeeService';
+import { STAT_GRID_CLASS } from '../utils/statGrid';
 
 const secondaryButtonClass =
   'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60';
@@ -73,7 +74,7 @@ function SummaryContent({ data }: { data: EmployeeSummaryReport }) {
 
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <dl className={`${STAT_GRID_CLASS} lg:grid-cols-4`}>
         <StatCard compact tone="brand" label="Total de empleados" value={formatCount(data.totalEmployees)} />
         <StatCard compact tone="success" label="Activos" value={formatCount(data.activeEmployees)} />
         <StatCard compact tone="danger" label="Inactivos" value={formatCount(data.inactiveEmployees)} />

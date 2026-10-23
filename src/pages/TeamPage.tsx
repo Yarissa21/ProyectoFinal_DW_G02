@@ -74,7 +74,7 @@ function TeamPage() {
         description="Integrantes del grupo 3 con especialidad de proyecto G02."
       />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:[&>:last-child:nth-child(odd)]:col-span-2 lg:grid-cols-3 lg:[&>:last-child:nth-child(odd)]:col-span-1">
         {TEAM_MEMBERS.map((member) => (
           <MemberCard key={member.id} member={member} />
         ))}

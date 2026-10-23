@@ -15,6 +15,7 @@ import { formatDateTime } from '../utils/format';
 import { usePdfExport } from '../hooks/usePdfExport';
 import { fetchAcademicSummaryPdf } from '../services/academicReportService';
 import { useBranches, useDepartments } from '../hooks/useOrganization';
+import { STAT_GRID_CLASS } from '../utils/statGrid';
 
 const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600';
@@ -226,7 +227,7 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
 
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <dl className={`${STAT_GRID_CLASS} lg:grid-cols-5`}>
         <StatCard tone="brand" label="Empleados incluidos" value={formatCount(report.totalEmployees)} />
         <StatCard tone="success" label="Con registros" value={formatCount(report.employeesWithRecords)} />
         <StatCard tone="warning" label="Sin registros" value={formatCount(report.employeesWithoutRecords)} />

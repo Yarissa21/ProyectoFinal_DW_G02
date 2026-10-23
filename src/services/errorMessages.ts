@@ -21,6 +21,10 @@ const MESSAGE_BY_CODE: Record<string, string> = {
     'No se puede desactivar el departamento porque aún tiene empleados vigentes. Reasigna o retira a esos empleados e inténtalo de nuevo.',
   POSITION_HAS_CURRENT_EMPLOYEES:
     'No se puede desactivar el puesto porque aún tiene empleados vigentes. Reasigna o retira a esos empleados e inténtalo de nuevo.',
+  BRANCH_ALREADY_EXISTS: 'Ya existe una sede con ese código o nombre. Usa otro código u otro nombre.',
+  DEPARTMENT_ALREADY_EXISTS: 'Ya existe un departamento con ese código o nombre. Usa otro código u otro nombre.',
+  POSITION_ALREADY_EXISTS: 'Ya existe un puesto con ese código o nombre. Usa otro código u otro nombre.',
+  DOCUMENT_TYPE_ALREADY_EXISTS: 'Ya existe un tipo de documento con ese código o nombre. Usa otro código u otro nombre.',
 };
 
 const MESSAGE_BY_STATUS: Record<number, string> = {
