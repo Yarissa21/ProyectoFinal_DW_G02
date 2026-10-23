@@ -28,3 +28,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#Para que no se suban los reportes de pruebas
+test-results
+playwright-report
