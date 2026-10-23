@@ -25,6 +25,7 @@ const MESSAGE_BY_CODE: Record<string, string> = {
   DEPARTMENT_ALREADY_EXISTS: 'Ya existe un departamento con ese código o nombre. Usa otro código u otro nombre.',
   POSITION_ALREADY_EXISTS: 'Ya existe un puesto con ese código o nombre. Usa otro código u otro nombre.',
   DOCUMENT_TYPE_ALREADY_EXISTS: 'Ya existe un tipo de documento con ese código o nombre. Usa otro código u otro nombre.',
+  USER_EMAIL_ALREADY_EXISTS: 'Ya existe un usuario con ese correo electrónico. Usa otro correo.',
 };
 
 const MESSAGE_BY_STATUS: Record<number, string> = {
