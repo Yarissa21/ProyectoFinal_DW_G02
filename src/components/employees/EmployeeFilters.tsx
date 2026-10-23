@@ -4,16 +4,8 @@ import ErrorAlert from '../ErrorAlert';
 import { describeError } from '../../services/errorMessages';
 import type { EmployeeListState } from '../../hooks/useEmployeeListParams';
 import type { EmployeeCatalogs } from '../../types/catalog';
-import type { EmployeeSortField, EmploymentStatus, RecordStatus } from '../../types/employee';
-import type { SortOrder } from '../../types/pagination';
-import {
-  EMPLOYMENT_STATUS_LABELS,
-  EMPLOYMENT_STATUS_VALUES,
-  RECORD_STATUS_LABELS,
-  RECORD_STATUS_VALUES,
-  SORT_FIELD_LABELS,
-  SORT_FIELD_VALUES,
-} from '../../utils/employeeLabels';
+import type { EmploymentStatus } from '../../types/employee';
+import { EMPLOYMENT_STATUS_LABELS, EMPLOYMENT_STATUS_VALUES } from '../../utils/employeeLabels';
 
 interface EmployeeFiltersProps {
   params: EmployeeListState;
@@ -28,9 +20,9 @@ const SEARCH_DEBOUNCE_MS = 400;
 const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:bg-slate-50 disabled:text-slate-500';
 
-function Field({ id, label, className = '', children }: { id: string; label: string; className?: string; children: ReactNode }) {
+function Field({ id, label, children }: { id: string; label: string; children: ReactNode }) {
   return (
-    <div className={className}>
+    <div>
       <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-slate-700">
         {label}
       </label>
@@ -45,9 +37,7 @@ function EmployeeFilters({ params, catalogs, hasActiveFilters, onChange, onClear
   const [syncedSearch, setSyncedSearch] = useState(urlSearch);
   const timer = useRef<number | undefined>(undefined);
 
-  const activeCount = [params.sortBy, params.status, params.recordStatus, params.departmentId, params.positionId].filter(
-    Boolean,
-  ).length;
+  const activeCount = [params.status, params.departmentId, params.positionId].filter(Boolean).length;
   const [open, setOpen] = useState(activeCount > 0);
 
   if (urlSearch !== syncedSearch) {
@@ -103,7 +93,7 @@ function EmployeeFilters({ params, catalogs, hasActiveFilters, onChange, onClear
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Field id="emp-search" label="Buscar" className="sm:col-span-2">
+        <Field id="emp-search" label="Buscar por nombre">
           <input
             id="emp-search"
             type="search"
@@ -126,42 +116,7 @@ function EmployeeFilters({ params, catalogs, hasActiveFilters, onChange, onClear
           <span aria-hidden="true">{open ? '▲' : '▼'}</span>
         </button>
 
-        <div
-          id="emp-filtros-extra"
-          className={`${open ? 'grid' : 'hidden'} grid-cols-1 gap-4 sm:contents`}
-        >
-          <Field id="emp-sort" label="Ordenar por">
-            <select
-              id="emp-sort"
-              value={params.sortBy ?? ''}
-              onChange={(event) => {
-                const sortBy = (event.target.value || undefined) as EmployeeSortField | undefined;
-                onChange({ sortBy, sortOrder: sortBy ? (params.sortOrder ?? 'asc') : undefined });
-              }}
-              className={controlClass}
-            >
-              <option value="">Predeterminado</option>
-              {SORT_FIELD_VALUES.map((field) => (
-                <option key={field} value={field}>
-                  {SORT_FIELD_LABELS[field]}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <Field id="emp-order" label="Orden">
-            <select
-              id="emp-order"
-              value={params.sortOrder ?? 'asc'}
-              disabled={!params.sortBy}
-              onChange={(event) => onChange({ sortOrder: event.target.value as SortOrder })}
-              className={controlClass}
-            >
-              <option value="asc">Ascendente</option>
-              <option value="desc">Descendente</option>
-            </select>
-          </Field>
-
+        <div id="emp-filtros-extra" className={`${open ? 'grid' : 'hidden'} grid-cols-1 gap-4 sm:contents`}>
           <Field id="emp-status" label="Estado laboral">
             <select
               id="emp-status"
@@ -178,32 +133,12 @@ function EmployeeFilters({ params, catalogs, hasActiveFilters, onChange, onClear
             </select>
           </Field>
 
-          <Field id="emp-record" label="Expediente">
-            <select
-              id="emp-record"
-              value={params.recordStatus ?? ''}
-              onChange={(event) =>
-                onChange({ recordStatus: (event.target.value || undefined) as RecordStatus | undefined })
-              }
-              className={controlClass}
-            >
-              <option value="">Todos</option>
-              {RECORD_STATUS_VALUES.map((status) => (
-                <option key={status} value={status}>
-                  {RECORD_STATUS_LABELS[status]}
-                </option>
-              ))}
-            </select>
-          </Field>
-
           <Field id="emp-department" label="Departamento">
             <select
               id="emp-department"
               value={params.departmentId ?? ''}
               disabled={catalogsUnavailable}
-              onChange={(event) =>
-                onChange({ departmentId: event.target.value || undefined, positionId: undefined })
-              }
+              onChange={(event) => onChange({ departmentId: event.target.value || undefined, positionId: undefined })}
               className={controlClass}
             >
               <option value="">{catalogsUnavailable ? catalogPlaceholder : 'Todos'}</option>

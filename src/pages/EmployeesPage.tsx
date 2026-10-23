@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import CreateUserDialog from '../components/employees/CreateUserDialog';
 import EmployeeCardList from '../components/employees/EmployeeCardList';
 import EmployeeFilters from '../components/employees/EmployeeFilters';
+import EmployeeSortBar from '../components/employees/EmployeeSortBar';
 import EmployeeTable from '../components/employees/EmployeeTable';
 import ErrorAlert from '../components/ErrorAlert';
 import Pagination from '../components/Pagination';
@@ -10,11 +9,11 @@ import { useEmployeeCatalogs } from '../hooks/useEmployeeCatalogs';
 import { useEmployeeListParams } from '../hooks/useEmployeeListParams';
 import { useEmployees } from '../hooks/useEmployees';
 import { describeError } from '../services/errorMessages';
-import { useAuthStore } from '../store/authStore';
 import type { EmployeeSortField } from '../types/employee';
 import { PAGE_SIZES } from '../utils/employeeLabels';
 import LoadingState from '../components/LoadingState';
 import PageHeader from '../components/PageHeader';
+
 
 const primaryButtonClass =
   'rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
@@ -25,9 +24,6 @@ function EmployeesPage() {
   const { params, update, clearFilters, hasActiveFilters } = useEmployeeListParams();
   const catalogs = useEmployeeCatalogs();
   const query = useEmployees(params);
-  const isAdmin = useAuthStore((state) => state.user?.role.code === 'ADMIN');
-  const [userDialogOpen, setUserDialogOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
 
   const handleSort = (field: EmployeeSortField) => {
     if (params.sortBy === field) {
@@ -138,24 +134,11 @@ function EmployeesPage() {
         title="Empleados"
         description={statusText}
         actions={
-          <div className="flex flex-wrap gap-2">
-            {isAdmin && (
-              <button type="button" onClick={() => setUserDialogOpen(true)} className={secondaryButtonClass}>
-                + Crear usuario
-              </button>
-            )}
-            <Link to="/empleados/nuevo" className={primaryButtonClass}>
-              + Nuevo empleado
-            </Link>
-          </div>
+          <Link to="/empleados/nuevo" className={primaryButtonClass}>
+            + Nuevo empleado
+          </Link>
         }
       />
-
-      {notice && (
-        <p role="status" className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900">
-          {notice}
-        </p>
-      )}
 
       <EmployeeFilters
         params={params}
@@ -165,20 +148,9 @@ function EmployeesPage() {
         onClear={clearFilters}
       />
 
-      {renderContent()}
+      <EmployeeSortBar sortBy={params.sortBy} sortOrder={params.sortOrder} onSort={handleSort} />
 
-      {isAdmin && (
-        <CreateUserDialog
-          open={userDialogOpen}
-          defaults={{}}
-          chooseRole
-          onClose={() => setUserDialogOpen(false)}
-          onCreated={() => {
-            setUserDialogOpen(false);
-            setNotice('Usuario creado correctamente.');
-          }}
-        />
-      )}
+      {renderContent()}
     </section>
   );
 }

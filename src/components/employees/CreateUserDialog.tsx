@@ -9,6 +9,7 @@ import { USER_FORM_FIELDS, userSchema, type UserFormValues } from '../../schemas
 import type { UserAccount } from '../../types/user';
 import { USER_ROLE_LABELS, USER_ROLE_VALUES } from '../../utils/userLabels';
 import { resolveServerIssue, type ServerIssue } from '../../utils/formErrors';
+import PasswordInput from '../PasswordInput';
 
 export interface UserDefaults {
   email?: string;
@@ -105,10 +106,10 @@ function CreateUserForm({ defaults, chooseRole, onSubmit, onClose, onCreated }: 
         id="new-user-password"
         label="Contraseña inicial"
         required
-        hint="Mínimo 10 caracteres. Compártela de forma segura con la persona."
+        hint="Mínimo 8 caracteres. Compártela de forma segura con la persona."
         error={errors.password?.message}
       >
-        {(control) => <input type="password" autoComplete="new-password" {...control} {...register('password')} />}
+        {(control) => <PasswordInput autoComplete="new-password" {...control} {...register('password')} />}
       </FormField>
 
       {issue && <ServerIssueAlert issue={issue} onRetry={() => void submit()} />}

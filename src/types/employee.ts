@@ -108,6 +108,7 @@ export interface EmploymentHistoryParams {
   from?: string;
   to?: string;
   sortOrder?: SortOrder;
+  sortBy?: string;
 }
 
 export interface ReportCount {

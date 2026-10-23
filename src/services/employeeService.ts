@@ -67,6 +67,14 @@ export async function listEmploymentHistory(
   return res.data.data;
 }
 
+export async function fetchEmployeesSummaryPdf(): Promise<Blob> {
+  const res = await http.get<Blob>('/reports/employees-summary/export', {
+    responseType: 'blob',
+    timeout: 60000,
+  });
+  return res.data;
+}
+
 export async function getEmployeesSummary(): Promise<EmployeeSummaryReport> {
   const res = await http.get<ApiSuccess<EmployeeSummaryReport>>('/reports/employees-summary');
   return res.data.data;

@@ -5,7 +5,6 @@ import LoadingState from '../components/LoadingState';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import { useAcademicSummary } from '../hooks/useAcademicSummary';
-import { useEmployeeCatalogs } from '../hooks/useEmployeeCatalogs';
 import { describeError } from '../services/errorMessages';
 import type { AcademicSummaryParams, AcademicSummaryReport } from '../types/academicReport';
 import type { EmploymentStatus } from '../types/employee';
@@ -13,13 +12,17 @@ import { ACADEMIC_TYPE_LABELS } from '../utils/academicLabels';
 import { formatCount, formatPercentage } from '../utils/dashboardLabels';
 import { EMPLOYMENT_STATUS_LABELS, EMPLOYMENT_STATUS_VALUES } from '../utils/employeeLabels';
 import { formatDateTime } from '../utils/format';
+import { usePdfExport } from '../hooks/usePdfExport';
+import { fetchAcademicSummaryPdf } from '../services/academicReportService';
+import { useBranches, useDepartments } from '../hooks/useOrganization';
+import { STAT_GRID_CLASS } from '../utils/statGrid';
 
 const controlClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600';
 const secondaryButtonClass =
   'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-60';
-const textButtonClass =
-  'rounded-md px-2 py-1 text-sm font-medium text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
+const clearButtonClass =
+  'whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600';
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
 const numThClass = 'px-4 py-3 text-right text-xs font-semibold text-slate-600';
 
@@ -47,7 +50,7 @@ function CoverageBar({ report }: { report: AcademicSummaryReport }) {
       <SectionTitle id="coverage-title">Cobertura académica</SectionTitle>
       <p className="mt-2 text-sm text-slate-700">
         {formatCount(report.employeesWithRecords)} de {formatCount(report.totalEmployees)} empleados tienen al
-        menos un antecedente registrado ({formatPercentage(report.coveragePercentage)}).
+        menos un registro académico ({formatPercentage(report.coveragePercentage)}).
       </p>
       <div
         role="progressbar"
@@ -142,7 +145,7 @@ function DepartmentCoverage({ report }: { report: AcademicSummaryReport }) {
                     Empleados
                   </th>
                   <th scope="col" className={numThClass}>
-                    Con antecedentes
+                    Con registros
                   </th>
                   <th scope="col" className={numThClass}>
                     Cobertura
@@ -180,7 +183,7 @@ function DepartmentCoverage({ report }: { report: AcademicSummaryReport }) {
                     <dd className="text-slate-900">{formatCount(row.employeeCount)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-600">Con antecedentes</dt>
+                    <dt className="text-xs text-slate-600">Con registros</dt>
                     <dd className="text-slate-900">{formatCount(row.employeesWithRecords)}</dd>
                   </div>
                   <div>
@@ -209,8 +212,8 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
       <EmptyState
         title="No hay empleados que coincidan con los filtros."
         action={
-          <button type="button" onClick={onClear} className={textButtonClass}>
-            Quitar filtros
+          <button type="button" onClick={onClear} className={secondaryButtonClass}>
+            Limpiar filtros
           </button>
         }
       />
@@ -224,10 +227,10 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
 
   return (
     <div className="space-y-6">
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <dl className={`${STAT_GRID_CLASS} lg:grid-cols-5`}>
         <StatCard tone="brand" label="Empleados incluidos" value={formatCount(report.totalEmployees)} />
-        <StatCard tone="success" label="Con antecedentes" value={formatCount(report.employeesWithRecords)} />
-        <StatCard tone="warning" label="Sin antecedentes" value={formatCount(report.employeesWithoutRecords)} />
+        <StatCard tone="success" label="Con registros" value={formatCount(report.employeesWithRecords)} />
+        <StatCard tone="warning" label="Sin registros" value={formatCount(report.employeesWithoutRecords)} />
         <StatCard tone="info" label="Registros académicos" value={formatCount(report.totalAcademicRecords)} />
         <StatCard
           tone="success"
@@ -249,18 +252,23 @@ function SummaryContent({ report, hasFilters, onClear }: { report: AcademicSumma
 }
 
 function AcademicSummaryPage() {
+  const [branchId, setBranchId] = useState('');
   const [departmentId, setDepartmentId] = useState('');
   const [status, setStatus] = useState<EmploymentStatus | ''>('');
 
   const params: AcademicSummaryParams = {
+    branchId: branchId || undefined,
     departmentId: departmentId || undefined,
     status: status || undefined,
   };
   const query = useAcademicSummary(params);
-  const catalogs = useEmployeeCatalogs();
+  const pdf = usePdfExport(() => fetchAcademicSummaryPdf(params), 'resumen-academico');
+  const departments = useDepartments({ branchId: branchId || undefined, isActive: true, limit: 100 });
+  const branches = useBranches({ isActive: true, limit: 100 });
 
-  const hasFilters = departmentId !== '' || status !== '';
+  const hasFilters = branchId !== '' || departmentId !== '' || status !== '';
   const clearFilters = () => {
+    setBranchId('');
     setDepartmentId('');
     setStatus('');
   };
@@ -279,17 +287,52 @@ function AcademicSummaryPage() {
         title="Resumen académico"
         description={statusText}
         actions={
-          <button type="button" onClick={() => void query.refetch()} disabled={query.isFetching} className={secondaryButtonClass}>
-            Actualizar
-          </button>
+          <>
+            <button type="button" onClick={() => void pdf.run()} disabled={pdf.isExporting} className={secondaryButtonClass}>
+              {pdf.isExporting ? 'Generando PDF…' : 'Exportar PDF'}
+            </button>
+            <button type="button" onClick={() => void query.refetch()} disabled={query.isFetching} className={secondaryButtonClass}>
+              Actualizar
+            </button>
+          </>
         }
       />
+
+      {pdf.error && <ErrorAlert error={pdf.error} onRetry={() => void pdf.run()} />}
 
       <form
         aria-label="Filtros del resumen académico"
         onSubmit={(event) => event.preventDefault()}
-        className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+        className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-end"
       >
+        <div>
+          <label htmlFor="summary-branch" className="mb-1.5 block text-sm font-medium text-slate-700">
+            Sede
+          </label>
+          <select
+            id="summary-branch"
+            value={branchId}
+            onChange={(event) => {
+              setBranchId(event.target.value);
+              setDepartmentId('');
+            }}
+            disabled={branches.isPending}
+            aria-describedby={branches.isError ? 'summary-branch-error' : undefined}
+            className={controlClass}
+          >
+            <option value="">Todas</option>
+            {branches.data?.items.map((branch) => (
+              <option key={branch.id} value={branch.id}>
+                {branch.name}
+              </option>
+            ))}
+          </select>
+          {branches.isError && (
+            <p id="summary-branch-error" role="alert" className="mt-1 text-xs text-red-700">
+              No se pudieron cargar las sedes.
+            </p>
+          )}
+        </div>
         <div>
           <label htmlFor="summary-department" className="mb-1.5 block text-sm font-medium text-slate-700">
             Departamento
@@ -298,18 +341,18 @@ function AcademicSummaryPage() {
             id="summary-department"
             value={departmentId}
             onChange={(event) => setDepartmentId(event.target.value)}
-            disabled={catalogs.isPending}
-            aria-describedby={catalogs.isError ? 'summary-department-error' : undefined}
+            disabled={departments.isPending}
+            aria-describedby={departments.isError ? 'summary-department-error' : undefined}
             className={controlClass}
           >
             <option value="">Todos</option>
-            {catalogs.data?.departments.map((department) => (
+            {departments.data?.items.map((department) => (
               <option key={department.id} value={department.id}>
                 {department.name}
               </option>
             ))}
           </select>
-          {catalogs.isError && (
+          {departments.isError && (
             <p id="summary-department-error" role="alert" className="mt-1 text-xs text-red-700">
               No se pudieron cargar los departamentos.
             </p>
@@ -333,9 +376,9 @@ function AcademicSummaryPage() {
             ))}
           </select>
         </div>
-        <div>
+          <div className={hasFilters ? 'sm:col-span-2 lg:col-span-1' : 'hidden lg:block'}>
           {hasFilters && (
-            <button type="button" onClick={clearFilters} className={textButtonClass}>
+            <button type="button" onClick={clearFilters} className={clearButtonClass}>
               Limpiar filtros
             </button>
           )}

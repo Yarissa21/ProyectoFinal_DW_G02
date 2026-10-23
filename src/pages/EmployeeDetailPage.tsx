@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { EmploymentStatusBadge } from '../components/EmployeeBadges';
 import AcademicRecordsSection from '../components/academic/AcademicRecordsSection';
+import DocumentsSection from '../components/documents/DocumentsSection';
 import BackLink from '../components/employees/BackLink';
 import DetailTabs, { type DetailTab } from '../components/employees/DetailTabs';
 import EmployeeDeleteDialog from '../components/employees/EmployeeDeleteDialog';
@@ -16,12 +18,13 @@ import { useAuthStore } from '../store/authStore';
 import { fullName } from '../utils/format';
 
 type OpenDialog = 'status' | 'delete' | null;
-type DetailSection = 'info' | 'academic' | 'history';
+type DetailSection = 'info' | 'academic' | 'documents' | 'history';
 
 const TAB_PREFIX = 'employee-detail';
 const TABS: DetailTab[] = [
   { id: 'info', label: 'Información' },
-  { id: 'academic', label: 'Antecedentes' },
+  { id: 'academic', label: 'Académicos' },
+  { id: 'documents', label: 'Documentos' },
   { id: 'history', label: 'Historial' },
 ];
 
@@ -34,21 +37,10 @@ const dangerButtonClass =
 
 function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
-  const navigate = useNavigate();
   const role = useAuthStore((state) => state.user?.role.code);
   const query = useEmployee(id);
-  const [notice, setNotice] = useState<string | undefined>(
-    () => (location.state as { notice?: string } | null)?.notice,
-  );
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [section, setSection] = useState<DetailSection>('info');
-
-  useEffect(() => {
-    if ((location.state as { notice?: string } | null)?.notice) {
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.state, location.pathname, navigate]);
 
   if (query.isPending) return <LoadingState label="Cargando empleado…" />;
 
@@ -65,14 +57,12 @@ function EmployeeDetailPage() {
   const isAdmin = role === 'ADMIN';
   const canDelete = isAdmin && employee.status !== 'RETIRED';
 
+  const openDialog = (next: OpenDialog) => {
+    setDialog(next);
+  };
+
   return (
     <section aria-labelledby="employee-title" className="space-y-6">
-      {notice && (
-        <p role="status" className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-900">
-          {notice}
-        </p>
-      )}
-
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <BackLink to="/empleados">Volver al listado</BackLink>
@@ -94,11 +84,11 @@ function EmployeeDetailPage() {
               {employee.user ? 'Cambiar usuario' : 'Vincular usuario'}
             </Link>
           )}
-          <button type="button" onClick={() => setDialog('status')} className={secondaryButtonClass}>
+          <button type="button" onClick={() => openDialog('status')} className={secondaryButtonClass}>
             Cambiar estado
           </button>
           {canDelete && (
-            <button type="button" onClick={() => setDialog('delete')} className={dangerButtonClass}>
+            <button type="button" onClick={() => openDialog('delete')} className={dangerButtonClass}>
               Dar de baja
             </button>
           )}
@@ -111,12 +101,17 @@ function EmployeeDetailPage() {
           label="Secciones del empleado"
           tabs={TABS}
           active={section}
-          onChange={(id) => setSection(id as DetailSection)}
+          onChange={(id) => {
+            setSection(id as DetailSection);
+          }}
         />
         <div role="tabpanel" id={`${TAB_PREFIX}-panel-${section}`} aria-labelledby={`${TAB_PREFIX}-tab-${section}`}>
           {section === 'info' && <EmployeeDetailCard employee={employee} />}
           {section === 'academic' && (
             <AcademicRecordsSection employeeId={employee.id} employeeName={fullName(employee)} />
+          )}
+          {section === 'documents' && (
+            <DocumentsSection employeeId={employee.id} employeeName={fullName(employee)} />
           )}
           {section === 'history' && <EmploymentHistory employeeId={employee.id} />}
         </div>
@@ -128,7 +123,7 @@ function EmployeeDetailPage() {
         onClose={() => setDialog(null)}
         onSaved={() => {
           setDialog(null);
-          setNotice('Estado laboral actualizado correctamente.');
+          toast.success('Estado laboral actualizado correctamente.');
         }}
       />
 
@@ -139,7 +134,7 @@ function EmployeeDetailPage() {
           onClose={() => setDialog(null)}
           onDeleted={() => {
             setDialog(null);
-            setNotice('Empleado dado de baja correctamente.');
+            toast.success('Empleado dado de baja correctamente.');
           }}
         />
       )}

@@ -9,6 +9,7 @@ import { useAuthStore } from '../store/authStore';
 import { homePathForRole } from '../utils/roles';
 import FullScreenLoader from '../components/FullScreenLoader';
 import ErrorAlert from '../components/ErrorAlert';
+import PasswordInput from '../components/PasswordInput';
 
 function LoginPage() {
   const location = useLocation();
@@ -91,9 +92,8 @@ function LoginPage() {
             <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700">
               Contraseña
             </label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="current-password"
               disabled={isSubmitting}
               aria-invalid={errors.password ? 'true' : 'false'}
