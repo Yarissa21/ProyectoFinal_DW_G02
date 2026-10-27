@@ -86,7 +86,6 @@ function DocumentTypesPage() {
       if (!debouncedSearch) return true;
       return (
         item.name.toLowerCase().includes(debouncedSearch) ||
-        item.code.toLowerCase().includes(debouncedSearch) ||
         (item.description ?? '').toLowerCase().includes(debouncedSearch)
       );
     });
@@ -120,13 +119,10 @@ function DocumentTypesPage() {
     return (
       <div aria-busy={query.isFetching} className={`space-y-4 transition-opacity ${query.isFetching ? 'opacity-60' : ''}`}>
         <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white lg:block">
-          <table className="w-full min-w-[48rem] text-sm">
+          <table className="w-full min-w-[40rem] text-sm">
             <caption className="sr-only">Listado de tipos de documento</caption>
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th scope="col" className={thClass}>
-                  Código
-                </th>
                 <th scope="col" className={thClass}>
                   Nombre
                 </th>
@@ -149,8 +145,7 @@ function DocumentTypesPage() {
             <tbody className="divide-y divide-slate-100">
               {items.map((item) => (
                 <tr key={item.id}>
-                  <td className="px-4 py-3 align-top font-medium text-slate-900">{item.code}</td>
-                  <td className="px-4 py-3 align-top text-slate-900">{item.name}</td>
+                  <td className="px-4 py-3 align-top font-medium text-slate-900">{item.name}</td>
                   <td className="px-4 py-3 align-top text-slate-700">{item.description || '—'}</td>
                   <td className="px-4 py-3 align-top">
                     <RequiredBadge required={item.isRequired} />
@@ -173,10 +168,6 @@ function DocumentTypesPage() {
                 <ActiveBadge active={item.isActive} />
               </div>
               <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-                <div>
-                  <dt className="text-xs text-slate-600">Código</dt>
-                  <dd className="break-all text-slate-900">{item.code}</dd>
-                </div>
                 <div>
                   <dt className="text-xs text-slate-600">Obligatoriedad</dt>
                   <dd>
@@ -227,7 +218,7 @@ function DocumentTypesPage() {
             id="doctype-search"
             type="search"
             value={search}
-            placeholder="Código, nombre o descripción"
+            placeholder="Nombre o descripción"
             onChange={(event) => {
               setSearch(event.target.value);
             }}
