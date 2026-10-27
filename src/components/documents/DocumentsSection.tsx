@@ -203,6 +203,7 @@ function DocumentsSection({ employeeId, employeeName }: DocumentsSectionProps) {
     try {
       const blob = await fetchEmployeeDocumentFile(document.id);
       saveBlob(blob, document.originalName);
+      toast.success('El documento se descargó correctamente.');
     } catch (error) {
       toastOrReport(error, setFileError);
     } finally {
