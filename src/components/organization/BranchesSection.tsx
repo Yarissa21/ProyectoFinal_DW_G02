@@ -13,6 +13,7 @@ const COLUMNS: OrgColumn<Branch>[] = [
   {
     header: 'Nombre',
     primary: true,
+    sortField: 'name',
     cell: (item) => (
       <>
         {item.name}

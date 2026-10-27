@@ -10,7 +10,7 @@ type DialogState = { type: 'form'; position?: Position } | { type: 'status'; pos
 
 const COLUMNS: OrgColumn<Position>[] = [
   { header: 'Código', cell: (item) => <span className="font-medium">{item.code}</span> },
-  { header: 'Nombre', primary: true, cell: (item) => item.name },
+  { header: 'Nombre', primary: true, sortField: 'name', cell: (item) => item.name },
   {
     header: 'Departamentos',
     cell: (item) =>

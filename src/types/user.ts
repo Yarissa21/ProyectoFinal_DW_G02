@@ -1,3 +1,5 @@
+import type { SortOrder } from './pagination';
+
 export interface UserAccount {
   id: string;
   email: string;
@@ -15,6 +17,8 @@ export interface UserListParams {
   limit?: number;
   search?: string;
   isActive?: boolean;
+  sortBy?: string;
+  sortOrder?: SortOrder;
 }
 
 export interface CreateUserPayload {

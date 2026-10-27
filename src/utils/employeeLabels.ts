@@ -26,7 +26,7 @@ export const HISTORY_EVENT_LABELS: Record<EmploymentHistoryEventType, string> = 
 };
 
 export const SORT_FIELD_LABELS: Record<EmployeeSortField, string> = {
-  lastName: 'Apellido',
+  firstName: 'Nombre',
   hireDate: 'Fecha de ingreso',
 };
 

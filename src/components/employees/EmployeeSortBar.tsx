@@ -8,7 +8,7 @@ interface EmployeeSortBarProps {
 }
 
 const OPTIONS: { field: EmployeeSortField; label: string }[] = [
-  { field: 'lastName', label: 'Empleado' },
+  { field: 'firstName', label: 'Empleado' },
   { field: 'hireDate', label: 'Ingreso' },
 ];
 

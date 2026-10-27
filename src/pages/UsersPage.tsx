@@ -31,6 +31,7 @@ function UsersPage() {
     {
       header: 'Nombre',
       primary: true,
+      sortField: 'firstName',
       cell: (item) => (
         <>
           {fullName(item)}

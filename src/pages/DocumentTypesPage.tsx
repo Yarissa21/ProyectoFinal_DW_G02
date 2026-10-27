@@ -12,6 +12,8 @@ import toast from 'react-hot-toast';
 import { describeError } from '../services/errorMessages';
 import { useAuthStore } from '../store/authStore';
 import type { DocumentType } from '../types/document';
+import { SortButton, SortHeader } from '../components/SortHeader';
+import type { SortOrder } from '../types/pagination';
 
 type DialogState = { type: 'form'; documentType?: DocumentType } | { type: 'status'; documentType: DocumentType } | null;
 type StatusFilter = 'all' | 'active' | 'inactive';
@@ -39,6 +41,7 @@ function DocumentTypesPage() {
   const [dialog, setDialog] = useState<DialogState>(null);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
+  const [sortOrder, setSortOrder] = useState<SortOrder | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(search.trim().toLowerCase());
 
@@ -50,6 +53,10 @@ function DocumentTypesPage() {
     setSearch('');
     setStatus('all');
     searchRef.current?.focus();
+  };
+
+  const toggleSort = () => {
+    setSortOrder((current) => (current === 'asc' ? 'desc' : 'asc'));
   };
 
   const close = () => setDialog(null);
@@ -90,6 +97,10 @@ function DocumentTypesPage() {
       );
     });
 
+    if (sortOrder) {
+      items.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }) * (sortOrder === 'asc' ? 1 : -1));
+    }
+
     if (items.length === 0) {
       return hasFilters ? (
         <EmptyState
@@ -123,9 +134,7 @@ function DocumentTypesPage() {
             <caption className="sr-only">Listado de tipos de documento</caption>
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th scope="col" className={thClass}>
-                  Nombre
-                </th>
+                <SortHeader label="Nombre" active={sortOrder !== null} order={sortOrder ?? undefined} onClick={toggleSort} />
                 <th scope="col" className={thClass}>
                   Descripción
                 </th>
@@ -249,6 +258,10 @@ function DocumentTypesPage() {
             Limpiar filtros
           </button>
         )}
+      </div>
+      <div role="group" aria-label="Ordenar tipos de documento por" className="flex items-center gap-2 lg:hidden">
+        <span className="text-sm font-medium text-slate-700">Ordenar:</span>
+        <SortButton label="Nombre" active={sortOrder !== null} order={sortOrder ?? undefined} onClick={toggleSort} />
       </div>
 
       {renderContent()}
