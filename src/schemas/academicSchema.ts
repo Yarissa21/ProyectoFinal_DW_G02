@@ -5,23 +5,27 @@ export const ACADEMIC_FORM_FIELDS = ['type', 'title', 'institution', 'graduation
 export type AcademicFormField = (typeof ACADEMIC_FORM_FIELDS)[number];
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const CREDENTIAL_PATTERN = /^[A-Za-z0-9._/-]+$/;
 
-// El contrato (OpenAPI) solo declara como obligatorios type, title e institution
-// y no define longitudes máximas para los textos, por eso no se inventan aquí.
 export const academicSchema = z.object({
   type: z.enum(['DEGREE', 'CERTIFICATION', 'COURSE', 'OTHER'], { message: 'Selecciona el tipo de estudio' }),
-  title: z.string().trim().min(1, 'Ingresa el título o nombre del estudio'),
-  institution: z.string().trim().min(1, 'Ingresa la institución'),
+  title: z.string().trim().min(1, 'Ingresa el título o nombre del estudio').min(3, 'El título debe tener al menos 3 caracteres'),
+  institution: z.string().trim().min(1, 'Ingresa la institución').min(3, 'La institución debe tener al menos 3 caracteres'),
   graduationDate: z
     .string()
     .refine((value) => value === '' || DATE_PATTERN.test(value), 'Selecciona una fecha válida'),
-  credentialCode: z.string().trim(),
+  credentialCode: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === '' || CREDENTIAL_PATTERN.test(value),
+      'Usa solo letras, números, punto, guion, guion bajo o diagonal, sin espacios',
+    ),
   notes: z.string().trim(),
 });
 
 export type AcademicFormValues = z.infer<typeof academicSchema>;
 
-/** Fecha de hoy (zona horaria local) en formato AAAA-MM-DD, igual que devuelve un <input type="date">. */
 export function localToday(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -29,10 +33,6 @@ export function localToday(): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-/**
- * La fecha de graduación no puede ser posterior a hoy. Si el antecedente ya traía una fecha
- * (original) y no se modificó, se respeta para no bloquear la edición de otros campos.
- */
 export function buildAcademicSchema(originalGraduationDate = '', today: string = localToday()) {
   return academicSchema.superRefine((values, ctx) => {
     const date = values.graduationDate;

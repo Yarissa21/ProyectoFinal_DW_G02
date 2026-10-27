@@ -106,7 +106,7 @@ function CreateUserForm({ defaults, chooseRole, onSubmit, onClose, onCreated }: 
         id="new-user-password"
         label="Contraseña inicial"
         required
-        hint="Mínimo 8 caracteres. Compártela de forma segura con la persona."
+        hint="Mínimo 10 caracteres, con mayúsculas, minúsculas y números. Compártela de forma segura con la persona."
         error={errors.password?.message}
       >
         {(control) => <PasswordInput autoComplete="new-password" {...control} {...register('password')} />}
