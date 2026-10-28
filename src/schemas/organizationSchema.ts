@@ -9,7 +9,8 @@ const nameField = z
   .string()
   .trim()
   .min(1, 'Ingresa el nombre')
-  .min(2, 'El nombre debe tener al menos 2 caracteres');
+  .min(2, 'El nombre debe tener al menos 2 caracteres')
+  .regex(/[\p{L}\d]/u, 'El nombre debe incluir letras o números');
 
 export const branchSchema = z.object({
   code: codeField,

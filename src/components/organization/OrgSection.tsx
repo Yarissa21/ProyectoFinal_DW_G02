@@ -181,6 +181,14 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
                     </th>
                   ),
                 )}
+                <th scope="col" className={thClass}>
+                  Estado
+                </th>
+                {canManage && (
+                  <th scope="col" className={thClass}>
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
