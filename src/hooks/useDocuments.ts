@@ -27,7 +27,7 @@ export function useDocumentTypes(includeInactive = false) {
   return useQuery({
     queryKey: [...documentKeys.types, { includeInactive }] as const,
     queryFn: () => listDocumentTypes(includeInactive),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60_000,
   });
 }
 
@@ -68,6 +68,7 @@ function useRefreshDocumentTypes() {
   return () => {
     void queryClient.invalidateQueries({ queryKey: documentKeys.types });
     void queryClient.invalidateQueries({ queryKey: documentKeys.all });
+    void queryClient.invalidateQueries({ queryKey: ['self-service'] });
     void queryClient.invalidateQueries({ queryKey: ['employees'] });
     void queryClient.invalidateQueries({ queryKey: ['reports'] });
   };

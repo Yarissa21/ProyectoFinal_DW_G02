@@ -8,6 +8,7 @@ import { useUsers } from '../../hooks/useUsers';
 import { describeError } from '../../services/errorMessages';
 import { useAuthStore } from '../../store/authStore';
 import type { UserAccount } from '../../types/user';
+import toast from 'react-hot-toast';
 
 interface UserSelectFieldProps {
   id: string;
@@ -99,6 +100,7 @@ function UserSelectField({ id, label, hint, value, onChange, current, getDefault
             setCreated((list) => [...list, user]);
             onChange(user.id);
             setDialogOpen(false);
+            toast.success('Usuario creado correctamente.');
           }}
         />,
         document.body,

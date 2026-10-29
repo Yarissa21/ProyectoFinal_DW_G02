@@ -8,13 +8,15 @@ import ActiveBadge from './ActiveBadge';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { describeError } from '../../services/errorMessages';
 import type { OrgListParams } from '../../types/organization';
-import type { Paginated } from '../../types/pagination';
+import { SortButton, SortHeader } from '../SortHeader';
+import type { Paginated, SortOrder } from '../../types/pagination';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZES } from '../../utils/employeeLabels';
 
 export interface OrgColumn<T> {
   header: string;
   cell: (item: T) => ReactNode;
   primary?: boolean;
+  sortField?: string;
 }
 
 interface OrgSectionProps<T extends { id: string; isActive: boolean }> {
@@ -60,6 +62,8 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
   const [status, setStatus] = useState<StatusFilter>('all');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(DEFAULT_PAGE_SIZE);
+  const [sortBy, setSortBy] = useState<string | undefined>();
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const searchRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(search.trim());
 
@@ -68,11 +72,25 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
     limit,
     search: debouncedSearch || undefined,
     isActive: status === 'all' ? undefined : status === 'active',
+    sortBy,
+    sortOrder: sortBy ? sortOrder : undefined,
   });
   const data = query.data;
   const hasFilters = search.trim() !== '' || status !== 'all';
   const article = feminine ? 'una' : 'un';
   const primaryColumn = columns.find((column) => column.primary) ?? columns[0];
+
+  const sortableColumns = columns.filter((column) => column.sortField);
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+    setPage(1);
+  };
 
   const clearFilters = () => {
     setSearch('');
@@ -148,11 +166,21 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
             <caption className="sr-only">Listado de {plural}</caption>
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                {columns.map((column) => (
-                  <th key={column.header} scope="col" className={thClass}>
-                    {column.header}
-                  </th>
-                ))}
+                {columns.map((column) =>
+                  column.sortField ? (
+                    <SortHeader
+                      key={column.header}
+                      label={column.header}
+                      active={sortBy === column.sortField}
+                      order={sortOrder}
+                      onClick={() => handleSort(column.sortField as string)}
+                    />
+                  ) : (
+                    <th key={column.header} scope="col" className={thClass}>
+                      {column.header}
+                    </th>
+                  ),
+                )}
                 <th scope="col" className={thClass}>
                   Estado
                 </th>
@@ -266,6 +294,21 @@ function OrgSection<T extends { id: string; isActive: boolean }>({
           </button>
         )}
       </div>
+
+      {sortableColumns.length > 0 && (
+        <div role="group" aria-label={`Ordenar ${plural} por`} className="flex items-center gap-2 lg:hidden">
+          <span className="text-sm font-medium text-slate-700">Ordenar:</span>
+          {sortableColumns.map((column) => (
+            <SortButton
+              key={column.header}
+              label={column.header}
+              active={sortBy === column.sortField}
+              order={sortOrder}
+              onClick={() => handleSort(column.sortField as string)}
+            />
+          ))}
+        </div>
+      )}
 
       {renderContent()}
     </div>

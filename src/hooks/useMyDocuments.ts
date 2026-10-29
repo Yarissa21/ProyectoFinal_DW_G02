@@ -9,6 +9,7 @@ export function useMyDocuments(params: MyDocumentListParams) {
     queryKey: ['self-service', userId, 'documents', params] as const,
     queryFn: () => listMyDocuments(params),
     enabled: userId !== '',
+    staleTime: 0,
     placeholderData: keepPreviousData,
   });
 }

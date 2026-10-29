@@ -3,8 +3,6 @@ import { getMyProfile, listMyAcademicRecords, updateMyContact } from '../service
 import { useAuthStore } from '../store/authStore';
 import type { MyAcademicRecordListParams, UpdateSelfServiceContactPayload } from '../types/selfService';
 
-// El cliente de consultas no se limpia al cerrar sesión, así que el id del usuario
-// forma parte de la clave: un empleado nunca ve en caché los datos de otro.
 export const selfServiceKeys = {
   all: (userId: string) => ['self-service', userId] as const,
   profile: (userId: string) => [...selfServiceKeys.all(userId), 'profile'] as const,
@@ -18,6 +16,7 @@ export function useMyProfile() {
     queryKey: selfServiceKeys.profile(userId),
     queryFn: getMyProfile,
     enabled: userId !== '',
+    staleTime: 0,
   });
 }
 

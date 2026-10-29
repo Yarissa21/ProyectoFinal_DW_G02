@@ -51,7 +51,7 @@ function EmployeeTable({ items, sortBy, sortOrder, onSort }: EmployeeTableProps)
         <caption className="sr-only">Lista de empleados</caption>
         <thead className="border-b border-blue-100 bg-blue-50">
           <tr>
-            <SortHeader field="lastName" label="Empleado" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
+            <SortHeader field="firstName" label="Empleado" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
             <th scope="col" className={thClass}>
               DPI
             </th>
