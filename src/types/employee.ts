@@ -67,7 +67,7 @@ export interface UpdateEmploymentStatusPayload {
   terminationDate?: string;
 }
 
-export type EmployeeSortField = 'lastName' | 'hireDate';
+export type EmployeeSortField = 'firstName' | 'hireDate';
 
 export interface EmployeeListParams {
   page?: number;

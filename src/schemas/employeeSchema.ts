@@ -24,6 +24,18 @@ export const MAX_AGE = 100;
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const SALARY_PATTERN = /^\d+(\.\d{1,2})?$/;
+const DPI_PATTERN = /^\d{13}$/;
+export const NAME_PATTERN = /^\p{L}[\p{L}\s'’-]*$/u;
+const PHONE_PATTERN = /^(\+?502)?\d{8}$/;
+
+export const NAME_MIN_LENGTH = 2;
+export const NAME_MIN_MESSAGE = `Debe tener al menos ${NAME_MIN_LENGTH} caracteres.`;
+export const NAME_FORMAT_MESSAGE = 'Usa solo letras, espacios, guion o apóstrofo.';
+export const PHONE_MESSAGE = 'Ingresa un teléfono de 8 dígitos, por ejemplo 5512-3478.';
+
+export function isValidPhone(value: string): boolean {
+  return PHONE_PATTERN.test(value.replace(/[\s-]/g, ''));
+}
 
 const requiredText = (message: string) => z.string().trim().min(1, message);
 
@@ -34,7 +46,7 @@ export const employeeSchema = z.object({
   lastName: requiredText('Ingresa el primer apellido'),
   secondLastName: z.string().trim(),
   birthDate: z.string().regex(DATE_PATTERN, 'Selecciona la fecha de nacimiento'),
-  address: requiredText('Ingresa la dirección'),
+  address: requiredText('Ingresa la dirección').min(5, 'La dirección debe tener al menos 5 caracteres'),
   phone: z.string().trim(),
   email: z
     .string()
@@ -74,6 +86,30 @@ export function buildEmployeeSchema(
   today: string = localToday(),
 ) {
   return employeeSchema.superRefine((values, ctx) => {
+    const changed = (field: keyof EmployeeFormValues) => !initial || values[field] !== initial[field];
+    const addIssue = (path: keyof EmployeeFormValues, message: string) =>
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [path], message });
+
+    if (values.dpi && changed('dpi') && !DPI_PATTERN.test(values.dpi)) {
+      addIssue('dpi', 'El DPI debe tener exactamente 13 dígitos, sin espacios ni guiones.');
+    }
+
+    const nameFields = ['firstName', 'middleName', 'lastName', 'secondLastName'] as const;
+    for (const field of nameFields) {
+      const value = values[field];
+      if (value === '' || !changed(field)) continue;
+      if (value.length < NAME_MIN_LENGTH) addIssue(field, NAME_MIN_MESSAGE);
+      else if (!NAME_PATTERN.test(value)) addIssue(field, NAME_FORMAT_MESSAGE);
+    }
+
+    if (values.phone && changed('phone') && !isValidPhone(values.phone)) {
+      addIssue('phone', PHONE_MESSAGE);
+    }
+
+    if (SALARY_PATTERN.test(values.baseSalary) && changed('baseSalary') && Number(values.baseSalary) <= 0) {
+      addIssue('baseSalary', 'El salario debe ser mayor que cero.');
+    }
+
     const assignmentChanged =
       !initial || values.departmentId !== initial.departmentId || values.positionId !== initial.positionId;
 
@@ -85,6 +121,17 @@ export function buildEmployeeSchema(
           path: ['positionId'],
           message: 'Este puesto no está habilitado en el departamento elegido.',
         });
+      }
+    }
+
+    if (
+      DATE_PATTERN.test(values.hireDate) &&
+      DATE_PATTERN.test(values.birthDate) &&
+      (changed('hireDate') || changed('birthDate'))
+    ) {
+      const earliestHire = `${Number(values.birthDate.slice(0, 4)) + MIN_AGE}${values.birthDate.slice(4)}`;
+      if (values.hireDate < earliestHire) {
+        addIssue('hireDate', `La fecha de ingreso no puede ser anterior a que la persona cumpla ${MIN_AGE} años.`);
       }
     }
 

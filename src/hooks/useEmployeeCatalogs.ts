@@ -9,6 +9,6 @@ export function useEmployeeCatalogs() {
   return useQuery({
     queryKey: catalogKeys.employees,
     queryFn: getEmployeeCatalogs,
-    staleTime: 5 * 60_000,
+    staleTime: 60_000,
   });
 }

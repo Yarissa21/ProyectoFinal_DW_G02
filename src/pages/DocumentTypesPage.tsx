@@ -12,6 +12,8 @@ import toast from 'react-hot-toast';
 import { describeError } from '../services/errorMessages';
 import { useAuthStore } from '../store/authStore';
 import type { DocumentType } from '../types/document';
+import { SortButton, SortHeader } from '../components/SortHeader';
+import type { SortOrder } from '../types/pagination';
 
 type DialogState = { type: 'form'; documentType?: DocumentType } | { type: 'status'; documentType: DocumentType } | null;
 type StatusFilter = 'all' | 'active' | 'inactive';
@@ -39,6 +41,7 @@ function DocumentTypesPage() {
   const [dialog, setDialog] = useState<DialogState>(null);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
+  const [sortOrder, setSortOrder] = useState<SortOrder | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(search.trim().toLowerCase());
 
@@ -50,6 +53,10 @@ function DocumentTypesPage() {
     setSearch('');
     setStatus('all');
     searchRef.current?.focus();
+  };
+
+  const toggleSort = () => {
+    setSortOrder((current) => (current === 'asc' ? 'desc' : 'asc'));
   };
 
   const close = () => setDialog(null);
@@ -86,10 +93,13 @@ function DocumentTypesPage() {
       if (!debouncedSearch) return true;
       return (
         item.name.toLowerCase().includes(debouncedSearch) ||
-        item.code.toLowerCase().includes(debouncedSearch) ||
         (item.description ?? '').toLowerCase().includes(debouncedSearch)
       );
     });
+
+    if (sortOrder) {
+      items.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }) * (sortOrder === 'asc' ? 1 : -1));
+    }
 
     if (items.length === 0) {
       return hasFilters ? (
@@ -120,16 +130,11 @@ function DocumentTypesPage() {
     return (
       <div aria-busy={query.isFetching} className={`space-y-4 transition-opacity ${query.isFetching ? 'opacity-60' : ''}`}>
         <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white lg:block">
-          <table className="w-full min-w-[48rem] text-sm">
+          <table className="w-full min-w-[40rem] text-sm">
             <caption className="sr-only">Listado de tipos de documento</caption>
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th scope="col" className={thClass}>
-                  Código
-                </th>
-                <th scope="col" className={thClass}>
-                  Nombre
-                </th>
+                <SortHeader label="Nombre" active={sortOrder !== null} order={sortOrder ?? undefined} onClick={toggleSort} />
                 <th scope="col" className={thClass}>
                   Descripción
                 </th>
@@ -149,8 +154,7 @@ function DocumentTypesPage() {
             <tbody className="divide-y divide-slate-100">
               {items.map((item) => (
                 <tr key={item.id}>
-                  <td className="px-4 py-3 align-top font-medium text-slate-900">{item.code}</td>
-                  <td className="px-4 py-3 align-top text-slate-900">{item.name}</td>
+                  <td className="px-4 py-3 align-top font-medium text-slate-900">{item.name}</td>
                   <td className="px-4 py-3 align-top text-slate-700">{item.description || '—'}</td>
                   <td className="px-4 py-3 align-top">
                     <RequiredBadge required={item.isRequired} />
@@ -173,10 +177,6 @@ function DocumentTypesPage() {
                 <ActiveBadge active={item.isActive} />
               </div>
               <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-                <div>
-                  <dt className="text-xs text-slate-600">Código</dt>
-                  <dd className="break-all text-slate-900">{item.code}</dd>
-                </div>
                 <div>
                   <dt className="text-xs text-slate-600">Obligatoriedad</dt>
                   <dd>
@@ -227,7 +227,7 @@ function DocumentTypesPage() {
             id="doctype-search"
             type="search"
             value={search}
-            placeholder="Código, nombre o descripción"
+            placeholder="Nombre o descripción"
             onChange={(event) => {
               setSearch(event.target.value);
             }}
@@ -258,6 +258,10 @@ function DocumentTypesPage() {
             Limpiar filtros
           </button>
         )}
+      </div>
+      <div role="group" aria-label="Ordenar tipos de documento por" className="flex items-center gap-2 lg:hidden">
+        <span className="text-sm font-medium text-slate-700">Ordenar:</span>
+        <SortButton label="Nombre" active={sortOrder !== null} order={sortOrder ?? undefined} onClick={toggleSort} />
       </div>
 
       {renderContent()}

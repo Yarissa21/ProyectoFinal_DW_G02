@@ -4,6 +4,7 @@ import FormField from '../employees/FormField';
 import ServerIssueAlert from '../employees/ServerIssueAlert';
 import { useDocumentTypes, useUploadDocument } from '../../hooks/useDocuments';
 import { describeError } from '../../services/errorMessages';
+import { localToday } from '../../schemas/academicSchema';
 import type { UploadDocumentPayload } from '../../types/document';
 import { DOCUMENT_ACCEPT, formatFileSize, isAllowedDocument, MAX_DOCUMENT_BYTES } from '../../utils/documentFiles';
 import type { ServerIssue } from '../../utils/formErrors';
@@ -24,6 +25,21 @@ interface UploadFormProps {
 interface FormErrors {
   documentTypeId?: string;
   file?: string;
+  expiresAt?: string;
+}
+
+const TYPE_MESSAGE = 'Selecciona el tipo de documento.';
+
+function expiresError(value: string): string | undefined {
+  return value && value < localToday() ? 'La fecha de vencimiento no puede ser anterior a hoy.' : undefined;
+}
+
+function fileError(file: File | null): string | undefined {
+  if (!file) return 'Selecciona un archivo.';
+  if (!isAllowedDocument(file)) return 'Formato no permitido. Usa PDF, JPG, PNG, DOC o DOCX.';
+  if (file.size > MAX_DOCUMENT_BYTES) return 'El archivo supera el máximo de 2 MB.';
+  if (file.size === 0) return 'El archivo está vacío.';
+  return undefined;
 }
 
 function UploadForm({ onUpload, onClose, onUploaded }: UploadFormProps) {
@@ -35,15 +51,11 @@ function UploadForm({ onUpload, onClose, onUploaded }: UploadFormProps) {
   const [issue, setIssue] = useState<ServerIssue | null>(null);
   const [pending, setPending] = useState(false);
 
-  const validate = (): FormErrors => {
-    const next: FormErrors = {};
-    if (!documentTypeId) next.documentTypeId = 'Selecciona el tipo de documento.';
-    if (!file) next.file = 'Selecciona un archivo.';
-    else if (!isAllowedDocument(file)) next.file = 'Formato no permitido. Usa PDF, JPG, PNG, DOC o DOCX.';
-    else if (file.size > MAX_DOCUMENT_BYTES) next.file = 'El archivo supera el máximo de 2 MB.';
-    else if (file.size === 0) next.file = 'El archivo está vacío.';
-    return next;
-  };
+  const validate = (): FormErrors => ({
+    documentTypeId: documentTypeId ? undefined : TYPE_MESSAGE,
+    file: fileError(file),
+    expiresAt: expiresError(expiresAt),
+  });
 
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -51,7 +63,7 @@ function UploadForm({ onUpload, onClose, onUploaded }: UploadFormProps) {
     setIssue(null);
     const found = validate();
     setErrors(found);
-    if (Object.keys(found).length > 0 || !file) return;
+    if (Object.values(found).some(Boolean) || !file) return;
 
     setPending(true);
     try {
@@ -78,7 +90,11 @@ function UploadForm({ onUpload, onClose, onUploaded }: UploadFormProps) {
             {...control}
             value={documentTypeId}
             disabled={types.isPending || pending}
-            onChange={(event) => setDocumentTypeId(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setDocumentTypeId(value);
+              setErrors((current) => ({ ...current, documentTypeId: value ? undefined : TYPE_MESSAGE }));
+            }}
           >
             <option value="">{types.isPending ? 'Cargando…' : 'Selecciona un tipo'}</option>
             {options.map((item) => (
@@ -109,19 +125,27 @@ function UploadForm({ onUpload, onClose, onUploaded }: UploadFormProps) {
             accept={DOCUMENT_ACCEPT}
             {...control}
             disabled={pending}
-            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+            onChange={(event) => {
+              const selected = event.target.files?.[0] ?? null;
+              setFile(selected);
+              setErrors((current) => ({ ...current, file: fileError(selected) }));
+            }}
           />
         )}
       </FormField>
 
-      <FormField id="doc-expires" label="Fecha de vencimiento" hint="Opcional.">
+      <FormField id="doc-expires" label="Fecha de vencimiento" hint="Opcional." error={errors.expiresAt}>
         {(control) => (
           <input
             type="date"
             {...control}
             value={expiresAt}
             disabled={pending}
-            onChange={(event) => setExpiresAt(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setExpiresAt(value);
+              setErrors((current) => ({ ...current, expiresAt: expiresError(value) }));
+            }}
           />
         )}
       </FormField>

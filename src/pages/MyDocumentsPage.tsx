@@ -14,6 +14,7 @@ import type { MyDocument } from '../types/document';
 import { canPreviewDocument, formatFileSize, openBlobInTab, saveBlob } from '../utils/documentFiles';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZES } from '../utils/employeeLabels';
 import { formatDate, formatDateTime } from '../utils/format';
+import toast from 'react-hot-toast';
 
 const thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-600';
 const controlClass =
@@ -159,6 +160,7 @@ function MyDocumentsPage() {
     try {
       const blob = await fetchMyDocumentFile(document.id);
       saveBlob(blob, document.originalName);
+      toast.success('El documento se descargó correctamente.')
     } catch (error) {
       toastOrReport(error, setFileError);
     } finally {
